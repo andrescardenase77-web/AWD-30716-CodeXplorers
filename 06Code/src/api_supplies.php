@@ -1,7 +1,9 @@
 <?php
 require 'vendor/autoload.php';
 
-$mongodbUri = 'mongodb+srv://kachuqui_db_user:abtCJQPiKpKhMBz6@cluster0.x7strgx.mongodb.net/?appName=Cluster0';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+$mongodbUri = $_ENV['MONGODB_URI'];
 
 try {
     $client = new MongoDB\Client($mongodbUri);
@@ -57,7 +59,7 @@ try {
         $supply = new Supply($_POST);
 
         if (!$supply->isValidQuantity()) {
-            header('Location: views/error.php?type=supply');
+            header('Location: views/error.html?type=supply');
             exit;
         }
 
@@ -66,9 +68,9 @@ try {
         $result = $collection->insertOne($data);
 
         if ($result->getInsertedCount() > 0) {
-            header('Location: views/success.php?type=supply');
+            header('Location: views/success.html?type=supply');
         } else {
-            header('Location: views/error.php?type=supply');
+            header('Location: views/error.html?type=supply');
         }
         exit;
     }
@@ -77,7 +79,7 @@ try {
         header('Content-Type: application/json', true, 500);
         echo json_encode(['error' => $e->getMessage()]);
     } else {
-        header('Location: views/error.php?type=supply');
+        header('Location: views/error.html?type=supply');
     }
     exit;
 }

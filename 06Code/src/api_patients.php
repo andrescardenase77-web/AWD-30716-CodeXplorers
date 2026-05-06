@@ -2,7 +2,9 @@
 require 'vendor/autoload.php';
 
 
-$mongodbUri = 'mongodb+srv://kachuqui_db_user:abtCJQPiKpKhMBz6@cluster0.x7strgx.mongodb.net/?appName=Cluster0';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+$mongodbUri = $_ENV['MONGODB_URI'];
 
 try {
     $client = new MongoDB\Client($mongodbUri);
@@ -57,14 +59,14 @@ try {
         $result = $collection->insertOne($data);
 
         if ($result->getInsertedCount() > 0) {
-            header('Location: views/success.php?type=patient');
+            header('Location: views/success.html?type=patient');
         } else {
-            header('Location: views/error.php?type=patient');
+            header('Location: views/error.html?type=patient');
         }
         exit;
     }
 } catch (Exception $e) {
-    header('Location: views/error.php?type=patient');
+    header('Location: views/error.html?type=patient');
     exit;
 }
 ?>

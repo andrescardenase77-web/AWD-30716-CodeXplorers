@@ -19,20 +19,20 @@
                 <?php
                 $type = $_GET['type'] ?? '';
                 if ($type === 'patient') {
-                    echo '<a href="./patient-form.php" class="btn btn-secondary">Add another patient</a>';
-                    echo '<a href="./patient-list.php" class="btn btn-primary">View patients</a>';
+                    echo '<a href="./patient-form.html" class="btn btn-secondary">Add another patient</a>';
+                    echo '<a href="./patient-list.html" class="btn btn-primary">View patients</a>';
                 } elseif ($type === 'payment') {
-                    echo '<a href="./payment-form.php" class="btn btn-secondary">Add another payment</a>';
-                    echo '<a href="./payment-list.php" class="btn btn-primary">View payments</a>';
+                    echo '<a href="./payment-form.html" class="btn btn-secondary">Add another payment</a>';
+                    echo '<a href="./payment-list.html" class="btn btn-primary">View payments</a>';
                 } elseif ($type === 'supply') {
-                    echo '<a href="./supply-form.php" class="btn btn-secondary">Add another supply</a>';
-                    echo '<a href="./supply-list.php" class="btn btn-primary">View supplies</a>';
+                    echo '<a href="./supply-form.html" class="btn btn-secondary">Add another supply</a>';
+                    echo '<a href="./supply-list.html" class="btn btn-primary">View supplies</a>';
                 }
                 ?>
             </div>
             <br>
             <div>
-                <a href="../index.php" class="btn btn-secondary">Go to Home</a>
+                <a href="../index.html" class="btn btn-secondary">Go to Home</a>
             </div>
         </div>
     </main>
