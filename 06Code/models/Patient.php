@@ -1,41 +1,75 @@
 <?php
 
-class Patient {
-    public $patientID;
-    public $fullName;
-    public $birthday;
-    public $phone;
-    public $reasonForConsultation;
-    public $legalRepresentative;
+use Illuminate\Database\Eloquent\Model;
 
-    public function __construct($data) {
-        $this->patientID = $data['patientID'] ?? '';
-        $this->fullName = $data['fullName'] ?? '';
-        $this->birthday = $data['birthday'] ?? '';
-        $this->phone = $data['phone'] ?? '';
-        $this->reasonForConsultation = $data['reasonForConsultation'] ?? '';
-        $this->legalRepresentative = $data['legalRepresentative'] ?? '';
-    }
+class Patient extends Model {
+    protected $table = 'patients';
+    protected $primaryKey = 'patientID';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'patientID',
+        'fullName',
+        'birthday',
+        'phone',
+        'gender',
+        'reasonForConsultation',
+        'legalRepresentative'
+    ];
 
     public function validateData() {
-        if (empty($this->patientID) || strlen($this->patientID) !== 10) {
-            return false;
-        }
-        if (empty($this->fullName) || empty($this->birthday)) {
-            return false;
-        }
-        return true;
+        return !empty($this->fullName) && !empty($this->birthday);
     }
 
-    public function toArray() {
-        return [
-            'patientID' => $this->patientID,
-            'fullName' => $this->fullName,
-            'birthday' => $this->birthday,
-            'phone' => $this->phone,
-            'reasonForConsultation' => $this->reasonForConsultation,
-            'legalRepresentative' => $this->legalRepresentative,
-            'createdAt' => new MongoDB\BSON\UTCDateTime()
-        ];
+    public function isValidName() {
+        return !empty($this->fullName) && strlen($this->fullName) >= 3;
+    }
+
+    public function isValidPhone() {
+        return !empty($this->phone) && preg_match('/^[0-9]{10}$/', $this->phone);
+    }
+
+    public function isValidBirthday() {
+        if (empty($this->birthday)) {
+            return false;
+        }
+        
+        try {
+            $birthDate = new DateTime($this->birthday);
+            $today = new DateTime();
+            return $birthDate <= $today;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function getAge() {
+        if (!$this->isValidBirthday()) {
+            return null;
+        }
+        
+        $birthDate = new DateTime($this->birthday);
+        $today = new DateTime();
+        return $today->diff($birthDate)->y;
+    }
+
+    public function isMinor() {
+        $age = $this->getAge();
+        return $age !== null && $age < 18;
+    }
+
+    public function requiresLegalRepresentative() {
+        return $this->isMinor() && empty($this->legalRepresentative);
+    }
+
+    public function isValidGender() {
+        $validGenders = ['masculino', 'femenino', 'otro'];
+        return !empty($this->gender) && in_array($this->gender, $validGenders);
+    }
+
+    public function isValidReasonForConsultation() {
+        return !empty($this->reasonForConsultation) && strlen($this->reasonForConsultation) >= 5;
     }
 }
