@@ -6,6 +6,35 @@ try {
     require_once '../dbCredentials.php';
     require_once '../models/Payment.php';
 
+    $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '';
+    $wantsJson = str_contains($acceptHeader, 'application/json');
+
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        header('Content-Type: application/json');
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Payment ID required.']);
+            exit;
+        }
+
+        $payment = Payment::find($id);
+        if (!$payment) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Payment not found.']);
+            exit;
+        }
+
+        try {
+            Payment::destroy($id);
+            echo json_encode(['success' => true, 'message' => 'Payment deleted']);
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Deletion failed.']);
+        }
+        exit;
+    }
+
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $action = $_POST['action'] ?? 'create';
@@ -15,7 +44,12 @@ try {
             if ($id) {
                 Payment::destroy($id);
             }
-            header('Location: ../views/php/payment-list.php');
+            if ($wantsJson) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => 'Payment deleted']);
+            } else {
+                header('Location: ../views/php/payment-list.php');
+            }
             exit;
         }
 
@@ -27,7 +61,13 @@ try {
                     $payment->fill($_POST);
                     
                     if (!$payment->validatePayment()) {
-                        header('Location: ../views/php/error.php?type=payment');
+                        if ($wantsJson) {
+                            http_response_code(400);
+                            header('Content-Type: application/json');
+                            echo json_encode(['error' => 'Invalid payment data.']);
+                        } else {
+                            header('Location: ../views/php/error.php?type=payment');
+                        }
                         exit;
                     }
 
@@ -35,7 +75,13 @@ try {
                     $payment->save();
                 }
             }
-            header('Location: ../views/php/payment-list.php');
+
+            if ($wantsJson) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => 'Payment updated']);
+            } else {
+                header('Location: ../views/php/payment-list.php');
+            }
             exit;
         }
 
@@ -45,16 +91,34 @@ try {
             $payment->fill($_POST);
 
             if (!$payment->validatePayment()) {
-                header('Location: ../views/php/error.php?type=payment');
+                if ($wantsJson) {
+                    http_response_code(400);
+                    header('Content-Type: application/json');
+                    echo json_encode(['error' => 'Invalid payment data.']);
+                } else {
+                    header('Location: ../views/php/error.php?type=payment');
+                }
                 exit;
             }
 
             $payment->calculateStatus();
 
             if ($payment->save()) {
-                header('Location: ../views/php/success.php?type=payment');
+                if ($wantsJson) {
+                    http_response_code(201);
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true, 'message' => 'Payment recorded']);
+                } else {
+                    header('Location: ../views/php/success.php?type=payment');
+                }
             } else {
-                header('Location: ../views/php/error.php?type=payment');
+                if ($wantsJson) {
+                    http_response_code(500);
+                    header('Content-Type: application/json');
+                    echo json_encode(['error' => 'Could not record payment.']);
+                } else {
+                    header('Location: ../views/php/error.php?type=payment');
+                }
             }
             exit;
         }
@@ -65,6 +129,12 @@ try {
     }
 
 } catch (Throwable $e) {
-    header('Location: ../views/php/error.php?type=payment');
+    if ($wantsJson ?? false) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['error' => 'Something went wrong. Please try again later.']);
+    } else {
+        header('Location: ../views/php/error.php?type=payment');
+    }
     exit;
 }
