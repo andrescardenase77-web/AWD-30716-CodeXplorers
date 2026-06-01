@@ -3,7 +3,27 @@ session_start();
 require_once '../../dbCredentials.php';
 require_once '../../models/Payment.php';
 
-$payments = Payment::orderBy('created_at', 'desc')->get();
+$wantsJson = (isset($_GET['format']) && $_GET['format'] === 'json')
+    || (isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json'));
+
+if ($wantsJson) {
+    header('Content-Type: application/json');
+    $payments = Payment::orderBy('created_at', 'desc')->get();
+    $payload = [];
+    foreach ($payments as $item) {
+        $payload[] = [
+            'id' => $item->id,
+            'patientID' => $item->patientID,
+            'amount' => $item->amount,
+            'date' => $item->date,
+            'paymentType' => $item->paymentType,
+            'paymentMethod' => $item->paymentMethod,
+            'status' => $item->status
+        ];
+    }
+    echo json_encode($payload);
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -19,91 +39,70 @@ $payments = Payment::orderBy('created_at', 'desc')->get();
 </head>
 
 <body class="bg-light">
-    <header class="bg-primary">
-        <h1 class="text-white m-0">Control de Ingresos - Fábula Dental</h1>
-    </header>
+    <div id="paymentListApp">
+        <header class="bg-primary">
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2">
+                <h1 class="text-white m-0">Control de Ingresos - Fábula Dental</h1>
+                <span class="badge bg-light text-primary fw-semibold">Vue.js</span>
+            </div>
+        </header>
 
-    <main class="container my-5 form-container">
-        <div class="form-card w-100" style="max-width: 1200px;">
-            <h2 class="text-primary fw-bold text-center mb-4">Registro de Pagos</h2>
+        <main class="container my-5 form-container">
+            <div class="form-card w-100" style="max-width: 1200px;">
+                <h2 class="text-primary fw-bold text-center mb-4">Registro de Pagos</h2>
 
-            <div class="table-wrap">
-                <table class="records-table w-100">
-                    <thead>
-                        <tr>
-                            <th>Paciente (ID)</th>
-                            <th>Monto ($)</th>
-                            <th>Fecha</th>
-                            <th>Tipo</th>
-                            <th>Método</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($payments->isEmpty()): ?>
+                <div v-if="error" class="alert alert-danger">{{ error }}</div>
+                <div v-else-if="loading" class="alert alert-info">Cargando historial de pagos...</div>
+
+                <div class="table-wrap" v-if="!loading">
+                    <table class="records-table w-100">
+                        <thead>
                             <tr>
+                                <th>Paciente (ID)</th>
+                                <th>Monto ($)</th>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Método</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-if="payments.length === 0">
                                 <td colspan="7" class="text-center py-4 text-muted">No hay transacciones registradas.</td>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($payments as $item): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($item->patientID) ?></td>
-                                    <td>$<?= number_format($item->amount, 2) ?></td>
-                                    <td><?= date('d/m/Y', strtotime($item->date)) ?></td>
-                                    <td>
-                                        <?php if ($item->paymentType === 'Deposit'): ?>
-                                            Abono
-                                        <?php elseif ($item->paymentType === 'Final'): ?>
-                                            Final
-                                        <?php else: ?>
-                                            <?= htmlspecialchars($item->paymentType) ?>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($item->paymentMethod === 'Cash'): ?>
-                                            Efectivo
-                                        <?php elseif ($item->paymentMethod === 'Card'): ?>
-                                            Tarjeta
-                                        <?php elseif ($item->paymentMethod === 'Transfer'): ?>
-                                            Transferencia
-                                        <?php else: ?>
-                                            <?= htmlspecialchars($item->paymentMethod) ?>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="text-center">
-                                        <?php if ($item->status === 'Completed'): ?>
-                                            <span class="badge bg-success">Completado</span>
-                                        <?php elseif ($item->status === 'Partial'): ?>
-                                            <span class="badge bg-warning text-dark">Parcial</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">Pendiente</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-2 justify-content-center">
-                                            <a href="payment-edit.php?id=<?= $item->id ?>" class="btn btn-warning btn-sm">Editar</a>
-                                            <form action="../../controllers/payment-controller.php" method="POST" class="delete-form m-0">
-                                                <input type="hidden" name="action" value="delete">
-                                                <input type="hidden" name="id" value="<?= $item->id ?>">
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar registro de pago?');">Eliminar</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                            <tr v-for="payment in payments" :key="payment.id">
+                                <td>{{ payment.patientID }}</td>
+                                <td>${{ formatAmount(payment.amount) }}</td>
+                                <td>{{ formatDate(payment.date) }}</td>
+                                <td>{{ formatType(payment.paymentType) }}</td>
+                                <td>{{ formatMethod(payment.paymentMethod) }}</td>
+                                <td class="text-center">
+                                    <span v-if="payment.status === 'Completed'" class="badge bg-success">Completado</span>
+                                    <span v-else-if="payment.status === 'Partial'" class="badge bg-warning text-dark">Parcial</span>
+                                    <span v-else class="badge bg-secondary">Pendiente</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a :href="'payment-edit.php?id=' + payment.id" class="btn btn-warning btn-sm">Editar</a>
+                                        <button type="button" class="btn btn-danger btn-sm" @click="deletePayment(payment)">Eliminar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="actions-row mt-4">
-                <a href="../html/payment-form.html" class="btn btn-secondary">Registrar Pago</a>
-                <a href="../html/receptionist.html" class="btn btn-primary">Volver al Panel</a>
+                <div class="actions-row mt-4">
+                    <a href="../html/payment-form.html" class="btn btn-secondary">Registrar Pago</a>
+                    <a href="../html/receptionist.html" class="btn btn-primary">Volver al Panel</a>
+                </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="../js/payment-list.js"></script>
 </body>
 
 </html>
