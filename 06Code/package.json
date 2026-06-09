@@ -25,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/andrescardenase77-web/Fabula-Dental-Managment/issues"
   },
-  "homepage": "https://github.com/andrescardenase77-web/Fabula-Dental-Managment#readme"
+  "homepage": "https://github.com/andrescardenase77-web/Fabula-Dental-Managment#readme",
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "typescript": "^6.0.3"
+  }
 }

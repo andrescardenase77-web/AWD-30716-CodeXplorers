@@ -1,6 +1,20 @@
-"use strict";
+interface Payment {
+    id: string;
+    patientID: string;
+    amount: string | number;
+    date: string;
+    paymentType: string;
+    paymentMethod: string;
+}
+
+interface VueListData {
+    payments: Payment[];
+    loading: boolean;
+    error: string;
+}
+
 Vue.createApp({
-    data() {
+    data(): VueListData {
         return {
             payments: [],
             loading: true,
@@ -8,66 +22,64 @@ Vue.createApp({
         };
     },
     methods: {
-        async fetchPayments() {
+        async fetchPayments(this: any): Promise<void> {
             this.loading = true;
             this.error = '';
+
             try {
                 const response = await fetch('payment-list.php?format=json', {
                     headers: {
                         'Accept': 'application/json'
                     }
                 });
+
                 if (!response.ok) {
                     throw new Error('No se pudo cargar el historial de pagos.');
                 }
+
                 const data = await response.json();
                 this.payments = Array.isArray(data) ? data : [];
-            }
-            catch (error) {
+            } catch (error) {
                 this.error = 'No se pudo cargar el historial de pagos.';
-            }
-            finally {
+            } finally {
                 this.loading = false;
             }
         },
-        formatAmount(amount) {
+        formatAmount(amount: any): string {
             const num = parseFloat(amount);
-            if (isNaN(num))
-                return '0.00';
+            if (isNaN(num)) return '0.00';
             return num.toFixed(2);
         },
-        formatDate(dateString) {
-            if (!dateString)
-                return '-';
+        formatDate(dateString: string): string {
+            if (!dateString) return '-';
             const date = new Date(dateString);
-            if (isNaN(date.getTime()))
-                return dateString;
+            if (isNaN(date.getTime())) return dateString;
             return date.toLocaleDateString('es-EC');
         },
-        formatType(type) {
-            const types = {
+        formatType(type: string): string {
+            const types: Record<string, string> = {
                 'Deposit': 'Abono',
                 'Final': 'Final'
             };
             return types[type] || type || '-';
         },
-        formatMethod(method) {
-            const methods = {
+        formatMethod(method: string): string {
+            const methods: Record<string, string> = {
                 'Cash': 'Efectivo',
                 'Card': 'Tarjeta',
                 'Transfer': 'Transferencia'
             };
             return methods[method] || method || '-';
         },
-        async deletePayment(payment) {
-            if (!payment.id)
-                return;
-            if (!confirm('¿Eliminar registro de pago?'))
-                return;
+        async deletePayment(this: any, payment: Payment): Promise<void> {
+            if (!payment.id) return;
+            if (!confirm('¿Eliminar registro de pago?')) return;
+
             try {
                 const payload = new URLSearchParams();
                 payload.append('action', 'delete');
                 payload.append('id', payment.id);
+
                 const response = await fetch('../../controllers/payment-controller.php', {
                     method: 'POST',
                     headers: {
@@ -76,17 +88,18 @@ Vue.createApp({
                     },
                     body: payload.toString()
                 });
+
                 if (!response.ok) {
                     throw new Error('No se pudo eliminar el pago.');
                 }
-                this.payments = this.payments.filter((p) => p.id !== payment.id);
-            }
-            catch (error) {
+
+                this.payments = this.payments.filter((p: Payment) => p.id !== payment.id);
+            } catch (error: any) {
                 alert(error.message || 'No se pudo eliminar el pago.');
             }
         }
     },
-    mounted() {
+    mounted(this: any) {
         this.fetchPayments();
     }
 }).mount('#paymentListApp');
