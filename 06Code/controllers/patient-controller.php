@@ -9,6 +9,79 @@ try {
     $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '';
     $wantsJson = str_contains($acceptHeader, 'application/json');
 
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $action = $_GET['action'] ?? '';
+
+        if ($action === 'pediatric-category') {
+            header('Content-Type: application/json');
+
+            try {
+                $birthdayRaw = trim($_GET['birthday'] ?? '');
+
+                if ($birthdayRaw === '' || !strtotime($birthdayRaw)) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Valid birthday format required.']);
+                    exit;
+                }
+
+                $birthDate = new DateTimeImmutable($birthdayRaw);
+                $today     = new DateTimeImmutable('today');
+
+                // Reject future dates
+                if ($birthDate > $today) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Valid birthday format required.']);
+                    exit;
+                }
+
+                $diff           = $today->diff($birthDate);
+                $ageYears       = (int) $diff->y;
+                $ageMonths      = (int) $diff->m;
+                $totalDays      = (int) $diff->days;
+
+                // Determine pediatric category and dosage restriction factor
+                // based on standard clinical age classifications
+                if ($totalDays <= 27) {
+                    $category = 'Neonate';
+                    $factor   = '0.1x';
+                } elseif ($ageYears < 1) {
+                    $category = 'Infant';
+                    $factor   = '0.2x';
+                } elseif ($ageYears < 4) {
+                    $category = 'Toddler';
+                    $factor   = '0.35x';
+                } elseif ($ageYears < 7) {
+                    $category = 'Pre-schooler';
+                    $factor   = '0.5x';
+                } elseif ($ageYears < 12) {
+                    $category = 'School-age';
+                    $factor   = '0.75x';
+                } elseif ($ageYears < 18) {
+                    $category = 'Adolescent';
+                    $factor   = '0.85x';
+                } else {
+                    $category = 'Adult';
+                    $factor   = '1.0x';
+                }
+
+                http_response_code(200);
+                echo json_encode([
+                    'calculatedAgeYears'      => $ageYears,
+                    'calculatedAgeMonths'     => $ageMonths,
+                    'pediatricCategory'       => $category,
+                    'dosageRestrictionFactor' => $factor,
+                ]);
+            } catch (Throwable $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Internal processing error calculating clinical category.']);
+            }
+            exit;
+        }
+
+        header('Location: ../views/php/patient-list.php');
+        exit;
+    }
+
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         header('Content-Type: application/json');
         $id = $_GET['id'] ?? null;
