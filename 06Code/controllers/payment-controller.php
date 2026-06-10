@@ -9,7 +9,24 @@ try {
     $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '';
     $wantsJson = str_contains($acceptHeader, 'application/json');
 
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        header('Content-Type: application/json');
+        $action = $_GET['action'] ?? '';
+
+        if ($action === 'projection') {
+            try {
+                $projection = Payment::getMonthlyProjection();
+                echo json_encode($projection);
+            } catch (Throwable $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'No se pudo calcular la proyección de cobros.']);
+            }
+            exit;
+        }
+    }
+
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+
         header('Content-Type: application/json');
         $id = $_GET['id'] ?? null;
         if (!$id) {
