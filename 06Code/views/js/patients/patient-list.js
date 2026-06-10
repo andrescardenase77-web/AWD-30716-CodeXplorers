@@ -1,6 +1,5 @@
-const { createApp } = Vue;
-
-createApp({
+"use strict";
+Vue.createApp({
     data() {
         return {
             patients: [],
@@ -15,7 +14,6 @@ createApp({
             if (!query) {
                 return this.patients;
             }
-
             return this.patients.filter((patient) => {
                 const name = (patient.fullName || '').toLowerCase();
                 const id = (patient.patientID || '').toString().toLowerCase();
@@ -27,23 +25,22 @@ createApp({
         async fetchPatients() {
             this.loading = true;
             this.error = '';
-
             try {
                 const response = await fetch('patient-list.php?format=json', {
                     headers: {
                         'Accept': 'application/json'
                     }
                 });
-
                 if (!response.ok) {
                     throw new Error('No se pudo cargar la lista de pacientes.');
                 }
-
                 const data = await response.json();
                 this.patients = Array.isArray(data) ? data : [];
-            } catch (error) {
+            }
+            catch (error) {
                 this.error = 'No se pudo cargar la lista de pacientes.';
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -64,7 +61,6 @@ createApp({
             if (!confirm('¿Estás seguro de eliminar permanentemente este paciente?')) {
                 return;
             }
-
             try {
                 const deleteUrl = `../../controllers/patient-controller.php?id=${encodeURIComponent(patientID)}`;
                 let response = await fetch(deleteUrl, {
@@ -73,12 +69,10 @@ createApp({
                         'Accept': 'application/json'
                     }
                 });
-
                 if (!response.ok) {
                     const fallbackPayload = new URLSearchParams();
                     fallbackPayload.append('action', 'delete');
                     fallbackPayload.append('id', patientID);
-
                     response = await fetch('../../controllers/patient-controller.php', {
                         method: 'POST',
                         headers: {
@@ -88,24 +82,22 @@ createApp({
                         body: fallbackPayload.toString()
                     });
                 }
-
                 if (!response.ok) {
                     throw new Error('No se pudo eliminar el paciente.');
                 }
-
                 let result = null;
                 try {
                     result = await response.json();
-                } catch (error) {
+                }
+                catch (error) {
                     result = { success: true };
                 }
-
-                if (!result.success) {
-                    throw new Error(result.error || 'No se pudo eliminar el paciente.');
+                if (!result || !result.success) {
+                    throw new Error((result === null || result === void 0 ? void 0 : result.error) || 'No se pudo eliminar el paciente.');
                 }
-
                 this.patients = this.patients.filter((patient) => patient.patientID !== patientID);
-            } catch (error) {
+            }
+            catch (error) {
                 alert(error.message || 'No se pudo eliminar el paciente.');
             }
         }

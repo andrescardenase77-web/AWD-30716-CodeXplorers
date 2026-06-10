@@ -1,16 +1,15 @@
-const { createApp } = Vue;
-
-createApp({
+"use strict";
+Vue.createApp({
     data() {
         return {
             form: {
-                patientID: window.__PATIENT__?.patientID || '',
-                fullName: window.__PATIENT__?.fullName || '',
-                birthday: window.__PATIENT__?.birthday || '',
-                phone: window.__PATIENT__?.phone || '',
-                gender: window.__PATIENT__?.gender || '',
-                reasonForConsultation: window.__PATIENT__?.reasonForConsultation || '',
-                legalRepresentative: window.__PATIENT__?.legalRepresentative || ''
+                fullName: '',
+                patientID: '',
+                birthday: '',
+                phone: '',
+                gender: '',
+                legalRepresentative: '',
+                reasonForConsultation: ''
             },
             errors: [],
             submitting: false
@@ -29,7 +28,6 @@ createApp({
         validateForm() {
             const errors = [];
             const tenDigitRegex = /^[0-9]{10}$/;
-
             if (!this.form.fullName || this.form.fullName.trim().length < 3) {
                 errors.push('El nombre completo debe tener al menos 3 caracteres.');
             }
@@ -48,25 +46,21 @@ createApp({
             if (!this.form.reasonForConsultation || this.form.reasonForConsultation.trim().length < 5) {
                 errors.push('El motivo de la consulta debe tener al menos 5 caracteres.');
             }
-
             if (this.form.birthday) {
                 const birthDate = new Date(this.form.birthday);
                 const today = new Date();
                 if (birthDate > today) {
                     errors.push('La fecha de nacimiento no puede ser futura.');
                 }
-
                 let age = today.getFullYear() - birthDate.getFullYear();
                 const m = today.getMonth() - birthDate.getMonth();
                 if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
                     age--;
                 }
-
                 if (age < 18 && !this.form.legalRepresentative.trim()) {
                     errors.push(`El paciente es menor de edad (${age} años). Debe ingresar el representante legal.`);
                 }
             }
-
             this.errors = errors;
             return errors.length === 0;
         },
@@ -74,29 +68,34 @@ createApp({
             if (!this.validateForm()) {
                 return;
             }
-
             this.submitting = true;
             try {
-                const response = await fetch('patient-edit.php', {
-                    method: 'PUT',
+                const payload = new URLSearchParams();
+                payload.append('action', 'create');
+                Object.entries(this.form).forEach(([key, value]) => {
+                    var _a;
+                    payload.append(key, ((_a = value) !== null && _a !== void 0 ? _a : '').toString());
+                });
+                const response = await fetch('../../controllers/patient-controller.php', {
+                    method: 'POST',
                     headers: {
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
                     },
-                    body: JSON.stringify(this.form)
+                    body: payload.toString()
                 });
-
-                if (!response.ok) {
-                    const errorPayload = await response.json().catch(() => ({}));
-                    throw new Error(errorPayload.error || 'No se pudo actualizar el paciente.');
+                if (response.ok) {
+                    window.location.href = '../php/success.php?type=patient';
+                    return;
                 }
-
-                window.location.href = '../php/success.php?type=patient';
-            } catch (error) {
-                this.errors = [error.message || 'No se pudo actualizar el paciente.'];
-            } finally {
+                window.location.href = '../php/error.php?type=patient';
+            }
+            catch (error) {
+                window.location.href = '../php/error.php?type=patient';
+            }
+            finally {
                 this.submitting = false;
             }
         }
     }
-}).mount('#patientEditApp');
+}).mount('#patientApp');

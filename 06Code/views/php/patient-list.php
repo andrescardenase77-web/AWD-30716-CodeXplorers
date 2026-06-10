@@ -105,7 +105,7 @@ if ($wantsJson) {
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <script src="../js/patient-list.js"></script>
+    <script src="../js/patients/patient-list.js"></script>
 </body>
 
 </html>

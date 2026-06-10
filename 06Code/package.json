@@ -4,7 +4,9 @@
   "description": "Este proyecto contiene dependencias tanto de backend (PHP) como de frontend (JavaScript/Node.js). Sigue estos pasos para instalar todo lo necesario y poder ejecutar el proyecto de manera local.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --project tsconfig.json",
+    "watch": "tsc --project tsconfig.json --watch"
   },
   "keywords": [],
   "author": "",

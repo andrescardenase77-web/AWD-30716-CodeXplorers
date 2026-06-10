@@ -9,4 +9,13 @@ interface Window {
         paymentType: string;
         paymentMethod: string;
     };
+    __PATIENT__?: {
+        patientID: string;
+        fullName: string;
+        birthday: string;
+        phone: string;
+        gender: string;
+        reasonForConsultation: string;
+        legalRepresentative: string;
+    };
 }

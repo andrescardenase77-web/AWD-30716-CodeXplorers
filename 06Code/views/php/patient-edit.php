@@ -163,7 +163,7 @@ if (!$patient) {
         ]); ?>;
     </script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <script src="../js/patient-edit.js"></script>
+    <script src="../js/patients/patient-edit.js"></script>
 </body>
 
 </html>

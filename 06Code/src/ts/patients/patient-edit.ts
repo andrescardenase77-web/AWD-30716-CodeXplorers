@@ -1,23 +1,37 @@
-const { createApp } = Vue;
+interface PatientEditForm {
+    patientID: string;
+    fullName: string;
+    birthday: string;
+    phone: string;
+    gender: string;
+    reasonForConsultation: string;
+    legalRepresentative: string;
+}
 
-createApp({
-    data() {
+interface VuePatientEditData {
+    form: PatientEditForm;
+    errors: string[];
+    submitting: boolean;
+}
+
+Vue.createApp({
+    data(): VuePatientEditData {
         return {
             form: {
-                fullName: '',
-                patientID: '',
-                birthday: '',
-                phone: '',
-                gender: '',
-                legalRepresentative: '',
-                reasonForConsultation: ''
+                patientID: window.__PATIENT__?.patientID || '',
+                fullName: window.__PATIENT__?.fullName || '',
+                birthday: window.__PATIENT__?.birthday || '',
+                phone: window.__PATIENT__?.phone || '',
+                gender: window.__PATIENT__?.gender || '',
+                reasonForConsultation: window.__PATIENT__?.reasonForConsultation || '',
+                legalRepresentative: window.__PATIENT__?.legalRepresentative || ''
             },
             errors: [],
             submitting: false
         };
     },
     computed: {
-        today() {
+        today(): string {
             const now = new Date();
             const yyyy = now.getFullYear();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -26,8 +40,8 @@ createApp({
         }
     },
     methods: {
-        validateForm() {
-            const errors = [];
+        validateForm(this: any): boolean {
+            const errors: string[] = [];
             const tenDigitRegex = /^[0-9]{10}$/;
 
             if (!this.form.fullName || this.form.fullName.trim().length < 3) {
@@ -70,39 +84,33 @@ createApp({
             this.errors = errors;
             return errors.length === 0;
         },
-        async handleSubmit() {
+        async handleSubmit(this: any): Promise<void> {
             if (!this.validateForm()) {
                 return;
             }
 
             this.submitting = true;
             try {
-                const payload = new URLSearchParams();
-                payload.append('action', 'create');
-                Object.entries(this.form).forEach(([key, value]) => {
-                    payload.append(key, value ?? '');
-                });
-
-                const response = await fetch('../../controllers/patient-controller.php', {
-                    method: 'POST',
+                const response = await fetch('patient-edit.php', {
+                    method: 'PUT',
                     headers: {
                         'Accept': 'application/json',
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                        'Content-Type': 'application/json'
                     },
-                    body: payload.toString()
+                    body: JSON.stringify(this.form)
                 });
 
-                if (response.ok) {
-                    window.location.href = '../php/success.php?type=patient';
-                    return;
+                if (!response.ok) {
+                    const errorPayload = await response.json().catch(() => ({}));
+                    throw new Error(errorPayload.error || 'No se pudo actualizar el paciente.');
                 }
 
-                window.location.href = '../php/error.php?type=patient';
-            } catch (error) {
-                window.location.href = '../php/error.php?type=patient';
+                window.location.href = '../php/success.php?type=patient';
+            } catch (error: any) {
+                this.errors = [error.message || 'No se pudo actualizar el paciente.'];
             } finally {
                 this.submitting = false;
             }
         }
     }
-}).mount('#patientApp');
+}).mount('#patientEditApp');
