@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
 
-const public_IP = "34.28.34.201";
-const API_BASE_URL = `http://${public_IP}:3000/fabuladental/payments`;
+const API_BASE_URL = `http://${process.env.CRUD_API_IP}:3000/fabuladental/payments`;
 
-// Maps a payment to its clinical billing status (Pending, Partial, Completed).
 const calculateStatus = (payment: any): string => {
   if (payment.paymentType === 'Final') {
     return 'Completed';
@@ -14,7 +12,6 @@ const calculateStatus = (payment: any): string => {
   return 'Pending';
 };
 
-// 2. Get payment history
 export const getPaymentHistory = async (req: Request, res: Response) => {
   try {
     const response = await fetch(API_BASE_URL);
@@ -34,7 +31,6 @@ export const getPaymentHistory = async (req: Request, res: Response) => {
   }
 };
 
-// 3. Retrieve a specific payment record
 export const getPaymentById = async (req: Request, res: Response) => {
   try {
     const paymentId = String(req.params.paymentId ?? '');
@@ -67,7 +63,6 @@ export const getPaymentById = async (req: Request, res: Response) => {
   }
 };
 
-// 4. Retrieve all payment records for a specific patient
 export const getPaymentsByPatient = async (req: Request, res: Response) => {
   try {
     const patientId = String(req.params.patientId ?? '');

@@ -7,8 +7,8 @@ import {
 
 const router = Router();
 
-router.get('/payments', getPaymentHistory);
-router.get('/payments/:paymentId', getPaymentById);
-router.get('/patients/:patientId/payments', getPaymentsByPatient);
+router.get('/', getPaymentHistory);
+router.get('/:paymentId', getPaymentById);
+router.get('/patients/:patientId', getPaymentsByPatient);
 
 export default router;

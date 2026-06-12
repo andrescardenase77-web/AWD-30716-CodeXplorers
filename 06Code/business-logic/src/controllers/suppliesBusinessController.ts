@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
-const public_IP = "34.28.34.201";
-const API_BASE_URL = `http://${public_IP}:3000/fabuladental/supplies`;
+const API_BASE_URL = `http://${process.env.CRUD_API_IP}:3000/fabuladental/supplies`;
 
 export const updateExpirationStatus = async (req: Request, res: Response) => {
   try {

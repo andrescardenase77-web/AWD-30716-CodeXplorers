@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 
+const API_BASE_URL = `http://${process.env.CRUD_API_IP}:3000/fabuladental/patients`;
+
 const parseBirthday = (value: unknown): Date | null => {
   if (!value) {
     return null;
