@@ -95,3 +95,137 @@ export const calculatePatientPediatricCategory = async (req: Request, res: Respo
     return res.status(500).json({ error: "Internal processing error calculating clinical category." });
   }
 };
+
+export const validateLegalRepresentative = async (req: Request, res: Response) => {
+  try {
+    const birthday = parseBirthday(req.body?.birthday ?? req.body?.dateOfBirth);
+    const legalRep = req.body?.legalRepresentative || "";
+
+    if (!birthday) {
+      return res.status(400).json({ error: "Valid birthday format required." });
+    }
+
+    const { calculatedAgeYears } = calculateAge(birthday);
+
+    if (calculatedAgeYears < 18 && legalRep.trim().length === 0) {
+      return res.status(400).json({ error: "Patient is underage, legal representative is required." });
+    }
+
+    return res.status(200).json({
+      valid: true,
+      requiresLegalRepresentative: calculatedAgeYears < 18,
+      message: calculatedAgeYears >= 18 ? "Legal representative not required." : "Legal representative provided successfully."
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal processing error validating legal representative." });
+  }
+};
+
+export const calculateDaysToBirthday = async (req: Request, res: Response) => {
+  try {
+    const birthday = parseBirthday(req.body?.birthday ?? req.body?.dateOfBirth);
+
+    if (!birthday) {
+      return res.status(400).json({ error: "Valid birthday format required." });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const nextBirthday = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
+    
+    if (nextBirthday < today) {
+      nextBirthday.setFullYear(today.getFullYear() + 1);
+    }
+
+    const diffTime = Math.abs(nextBirthday.getTime() - today.getTime());
+    const daysUntilBirthday = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const isBirthdayWeek = daysUntilBirthday <= 7;
+
+    return res.status(200).json({
+      daysUntilBirthday,
+      isBirthdayWeek
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal processing error calculating days to birthday." });
+  }
+};
+
+export const calculateSeniorDiscount = async (req: Request, res: Response) => {
+  try {
+    const birthday = parseBirthday(req.body?.birthday ?? req.body?.dateOfBirth);
+
+    if (!birthday) {
+      return res.status(400).json({ error: "Valid birthday format required." });
+    }
+
+    const { calculatedAgeYears } = calculateAge(birthday);
+    const suggestedDiscountFactor = calculatedAgeYears >= 65 ? 0.50 : 0.00;
+
+    return res.status(200).json({
+      suggestedDiscountFactor,
+      isEligibleForDiscount: calculatedAgeYears >= 65
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal processing error calculating senior discount." });
+  }
+};
+
+export const estimateConsultationTime = async (req: Request, res: Response) => {
+  try {
+    const birthday = parseBirthday(req.body?.birthday ?? req.body?.dateOfBirth);
+    const reason = req.body?.reasonForConsultation || "";
+
+    if (!birthday) {
+      return res.status(400).json({ error: "Valid birthday format required." });
+    }
+
+    const { calculatedAgeYears } = calculateAge(birthday);
+    
+    let estimatedConsultationMinutes = 15;
+
+    if (calculatedAgeYears < 5 || calculatedAgeYears > 70) {
+      estimatedConsultationMinutes += 10;
+    }
+
+    if (reason.length > 50) {
+      estimatedConsultationMinutes += 10;
+    }
+
+    return res.status(200).json({
+      estimatedConsultationMinutes,
+      baseMinutes: 15
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal processing error estimating consultation time." });
+  }
+};
+
+export const calculateContactPriority = async (req: Request, res: Response) => {
+  try {
+    const phone = req.body?.phone || "";
+    const reason = req.body?.reasonForConsultation || "";
+
+    let contactPriorityScore = 0;
+
+    if (phone.length >= 10) {
+      contactPriorityScore += 10;
+    }
+
+    const urgentKeywords = ["dolor", "urgencia", "sangrado", "emergencia"];
+    const reasonLower = reason.toLowerCase();
+    
+    const hasUrgentKeywords = urgentKeywords.some(keyword => reasonLower.includes(keyword));
+    
+    if (hasUrgentKeywords) {
+      contactPriorityScore += 50;
+    }
+
+    return res.status(200).json({
+      contactPriorityScore,
+      requiresImmediateAttention: contactPriorityScore >= 50
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal processing error calculating contact priority." });
+  }
+};
