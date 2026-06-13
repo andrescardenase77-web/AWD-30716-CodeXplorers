@@ -10,11 +10,11 @@ import {
 
 const router = Router();
 
-router.post('/calculate-category', calculatePatientPediatricCategory);
-router.post('/validate-legal-representative', validateLegalRepresentative);
-router.post('/calculate-days-to-birthday', calculateDaysToBirthday);
-router.post('/calculate-senior-discount', calculateSeniorDiscount);
-router.post('/estimate-consultation-time', estimateConsultationTime);
-router.post('/calculate-contact-priority', calculateContactPriority);
+router.post('/pediatric-category', calculatePatientPediatricCategory);
+router.post('/legal-representative-validation', validateLegalRepresentative);
+router.post('/days-to-birthday', calculateDaysToBirthday);
+router.post('/senior-discount', calculateSeniorDiscount);
+router.post('/consultation-time-estimation', estimateConsultationTime);
+router.post('/contact-priority', calculateContactPriority);
 
 export default router;
