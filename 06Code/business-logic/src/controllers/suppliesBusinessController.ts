@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
 
 const API_BASE_URL = `http://${process.env.CRUD_API_IP}:3000/fabuladental/supplies`;
+const CRUD_API_KEY = process.env.CRUD_API_KEY || '';
 
 export const updateExpirationStatus = async (req: Request, res: Response) => {
   try {
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_BASE_URL, {
+      headers: { 'x-api-key': CRUD_API_KEY }
+    });
     if (!response.ok) throw new Error();
     const supplies = await response.json();
 
@@ -26,7 +29,10 @@ export const updateExpirationStatus = async (req: Request, res: Response) => {
       if (item.status !== newStatus) {
         const updateResponse = await fetch(`${API_BASE_URL}/${item.id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': CRUD_API_KEY
+          },
           body: JSON.stringify({
             supplyName: item.supplyName,
             quantity: item.quantity,
@@ -53,7 +59,9 @@ export const updateExpirationStatus = async (req: Request, res: Response) => {
 
 export const getAssetValuation = async (req: Request, res: Response) => {
   try {
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_BASE_URL, {
+      headers: { 'x-api-key': CRUD_API_KEY }
+    });
     if (!response.ok) throw new Error();
     const supplies = await response.json();
 
@@ -71,7 +79,9 @@ export const getAssetValuation = async (req: Request, res: Response) => {
 
 export const getRestockProvisions = async (req: Request, res: Response) => {
   try {
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_BASE_URL, {
+      headers: { 'x-api-key': CRUD_API_KEY }
+    });
     if (!response.ok) throw new Error();
     const supplies = await response.json();
 
@@ -103,7 +113,9 @@ export const getRestockProvisions = async (req: Request, res: Response) => {
 
 export const getExpirationLosses = async (req: Request, res: Response) => {
   try {
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_BASE_URL, {
+      headers: { 'x-api-key': CRUD_API_KEY }
+    });
     if (!response.ok) throw new Error();
     const supplies = await response.json();
 
@@ -123,7 +135,9 @@ export const getExpirationLosses = async (req: Request, res: Response) => {
 
 export const getCapitalRisks = async (req: Request, res: Response) => {
   try {
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_BASE_URL, {
+      headers: { 'x-api-key': CRUD_API_KEY }
+    });
     if (!response.ok) throw new Error();
     const supplies = await response.json();
 

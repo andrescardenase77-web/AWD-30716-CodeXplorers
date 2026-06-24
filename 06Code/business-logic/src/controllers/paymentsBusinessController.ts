@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 const API_BASE_URL = `http://${process.env.CRUD_API_IP}:3000/fabuladental/payments`;
+const CRUD_API_KEY = process.env.CRUD_API_KEY || '';
 
 const calculateStatus = (payment: any): string => {
   if (payment.paymentType === 'Final') {
@@ -14,7 +15,9 @@ const calculateStatus = (payment: any): string => {
 
 export const getPaymentHistory = async (req: Request, res: Response) => {
   try {
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_BASE_URL, {
+      headers: { 'x-api-key': CRUD_API_KEY }
+    });
     if (!response.ok) throw new Error();
     const payments = await response.json();
 
@@ -38,7 +41,9 @@ export const getPaymentById = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Payment ID required." });
     }
 
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_BASE_URL, {
+      headers: { 'x-api-key': CRUD_API_KEY }
+    });
     if (!response.ok) throw new Error();
     const payments = await response.json();
 
@@ -70,7 +75,9 @@ export const getPaymentsByPatient = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid Patient ID parameter." });
     }
 
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_BASE_URL, {
+      headers: { 'x-api-key': CRUD_API_KEY }
+    });
     if (!response.ok) throw new Error();
     const payments = await response.json();
 
