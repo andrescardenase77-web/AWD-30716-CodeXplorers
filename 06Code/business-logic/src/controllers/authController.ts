@@ -62,3 +62,41 @@ export const logout = (req: Request, res: Response) => {
 
   return res.status(200).json({ message: 'Sesión cerrada exitosamente.' });
 };
+
+export const register = async (req: Request, res: Response) => {
+  const { username, password, role } = req.body;
+
+  if (!username || !password || !role) {
+    return res.status(400).json({ error: 'Missing required fields or invalid role.' });
+  }
+
+  if (role !== 'Administrator' && role !== 'Dentist' && role !== 'Receptionist') {
+    return res.status(400).json({ error: 'Missing required fields or invalid role.' });
+  }
+
+  try {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const crudResponse = await fetch(`${CRUD_BASE_URL}/fabuladental/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CRUD_API_KEY,
+      },
+      body: JSON.stringify({
+        username,
+        password: hashedPassword,
+        role,
+      }),
+    });
+
+    if (!crudResponse.ok) {
+      return res.status(400).json({ error: 'Missing required fields or invalid role.' });
+    }
+
+    return res.status(201).json({ success: true, message: 'User registered successfully' });
+  } catch {
+    return res.status(500).json({ error: 'Error interno al intentar registrar el usuario.' });
+  }
+};
