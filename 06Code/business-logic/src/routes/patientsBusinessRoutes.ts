@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { checkRole } from '../middleware/checkRole';
 import { 
   calculatePatientPediatricCategory,
   validateLegalRepresentative,
@@ -10,8 +11,8 @@ import {
 
 const router = Router();
 
-router.post('/pediatric-category', calculatePatientPediatricCategory);
-router.post('/legal-representative-validation', validateLegalRepresentative);
+router.post('/pediatric-category', checkRole(['Dentist']), calculatePatientPediatricCategory);
+router.post('/legal-representative-validation', checkRole(['Dentist']), validateLegalRepresentative);
 router.post('/days-to-birthday', calculateDaysToBirthday);
 router.post('/senior-discount', calculateSeniorDiscount);
 router.post('/consultation-time-estimation', estimateConsultationTime);

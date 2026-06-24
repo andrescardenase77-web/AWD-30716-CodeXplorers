@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { checkRole } from '../middleware/checkRole';
 import {
   getPaymentHistory,
   getPaymentById,
@@ -7,7 +8,7 @@ import {
 
 const router = Router();
 
-router.get('/', getPaymentHistory);
+router.get('/', checkRole(['Receptionist']), getPaymentHistory);
 router.get('/:paymentId', getPaymentById);
 router.get('/patients/:patientId', getPaymentsByPatient);
 
