@@ -1,0 +1,64 @@
+import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { tokenBlacklist } from '../middleware/checkRole';
+
+const CRUD_BASE_URL = `http://${process.env.CRUD_API_IP || 'localhost'}:3000`;
+const CRUD_API_KEY = process.env.CRUD_API_KEY || '';
+
+export const login = async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'username y password son requeridos.' });
+  }
+
+  try {
+    const crudResponse = await fetch(
+      `${CRUD_BASE_URL}/fabuladental/users/${encodeURIComponent(username)}`,
+      {
+        headers: { 'x-api-key': CRUD_API_KEY },
+      }
+    );
+
+    if (!crudResponse.ok) {
+      return res.status(401).json({ error: 'Authentication failure. Credenciales inválidas.' });
+    }
+
+    const user = await crudResponse.json() as { username: string; password: string; role: string };
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Authentication failure. Credenciales inválidas.' });
+    }
+
+    const token = jwt.sign(
+      { username: user.username, role: user.role },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '1h' }
+    );
+
+    return res.status(200).json({
+      message: 'Login exitoso.',
+      token,
+      role: user.role,
+    });
+
+  } catch {
+    return res.status(500).json({ error: 'Error interno al intentar autenticar.' });
+  }
+};
+
+export const logout = (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(400).json({ error: 'No se encontró un token en el header Authorization.' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  tokenBlacklist.add(token);
+
+  return res.status(200).json({ message: 'Sesión cerrada exitosamente.' });
+};
