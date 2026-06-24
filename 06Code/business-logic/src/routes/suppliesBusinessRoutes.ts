@@ -10,10 +10,10 @@ import {
 
 const router = Router();
 
-router.post('/status-calculations', updateExpirationStatus);
+router.post('/status-calculations', checkRole(['Administrator']), updateExpirationStatus);
 router.get('/asset-valuations', checkRole(['Administrator']), getAssetValuation);
 router.get('/restock-provisions', checkRole(['Administrator']), getRestockProvisions);
-router.get('/expiration-losses', getExpirationLosses);
-router.get('/capital-risks', getCapitalRisks);
+router.get('/expiration-losses', checkRole(['Administrator']), getExpirationLosses);
+router.get('/capital-risks', checkRole(['Administrator']), getCapitalRisks);
 
 export default router;

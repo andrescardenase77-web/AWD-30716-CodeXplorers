@@ -9,7 +9,7 @@ import {
 const router = Router();
 
 router.get('/', checkRole(['Receptionist']), getPaymentHistory);
-router.get('/:paymentId', getPaymentById);
-router.get('/patients/:patientId', getPaymentsByPatient);
+router.get('/:paymentId', checkRole(['Receptionist']), getPaymentById);
+router.get('/patients/:patientId', checkRole(['Receptionist']), getPaymentsByPatient);
 
 export default router;
