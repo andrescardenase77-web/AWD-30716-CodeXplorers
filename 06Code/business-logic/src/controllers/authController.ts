@@ -10,7 +10,7 @@ export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ error: 'username y password son requeridos.' });
+    return res.status(400).json({ error: 'username and password are required.' });
   }
 
   try {
@@ -22,14 +22,14 @@ export const login = async (req: Request, res: Response) => {
     );
 
     if (!crudResponse.ok) {
-      return res.status(401).json({ error: 'Authentication failure. Credenciales inválidas.' });
+      return res.status(401).json({ error: 'Authentication failure. Invalid credentials.' });
     }
 
     const user = await crudResponse.json() as { username: string; password: string; role: string };
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      return res.status(401).json({ error: 'Authentication failure. Credenciales inválidas.' });
+      return res.status(401).json({ error: 'Authentication failure. Invalid credentials.' });
     }
 
     const token = jwt.sign(
@@ -39,13 +39,13 @@ export const login = async (req: Request, res: Response) => {
     );
 
     return res.status(200).json({
-      message: 'Login exitoso.',
+      message: 'Login successful.',
       token,
       role: user.role,
     });
 
   } catch {
-    return res.status(500).json({ error: 'Error interno al intentar autenticar.' });
+    return res.status(500).json({ error: 'Internal error attempting to authenticate.' });
   }
 };
 
@@ -53,14 +53,14 @@ export const logout = (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(400).json({ error: 'No se encontró un token en el header Authorization.' });
+    return res.status(400).json({ error: 'No token found in the Authorization header.' });
   }
 
   const token = authHeader.split(' ')[1];
 
   tokenBlacklist.add(token);
 
-  return res.status(200).json({ message: 'Sesión cerrada exitosamente.' });
+  return res.status(200).json({ message: 'Session successfully closed.' });
 };
 
 export const register = async (req: Request, res: Response) => {
@@ -97,6 +97,6 @@ export const register = async (req: Request, res: Response) => {
 
     return res.status(201).json({ success: true, message: 'User registered successfully' });
   } catch {
-    return res.status(500).json({ error: 'Error interno al intentar registrar el usuario.' });
+    return res.status(500).json({ error: 'Internal error while trying to register the user.' });
   }
 };
