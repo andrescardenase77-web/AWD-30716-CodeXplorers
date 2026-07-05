@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
+import cors from 'cors';
 import suppliesBusinessRoutes from './routes/suppliesBusinessRoutes';
 import paymentsBusinessRoutes from './routes/paymentsBusinessRoutes';
 import patientsBusinessRoutes from './routes/patientsBusinessRoutes';
@@ -10,6 +11,7 @@ import authRoutes from './routes/authRoutes';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+app.use(cors());
 app.use(express.json());
 
 app.use('/fabuladental/auth', authRoutes);

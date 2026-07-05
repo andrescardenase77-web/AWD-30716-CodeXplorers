@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-const API_BASE_URL = `http://${process.env.CRUD_API_IP}:3000/fabuladental/supplies`;
+const API_BASE_URL = `${process.env.CRUD_API_URL || 'https://fabuladental-crud.duckdns.org/fabuladental'}/supplies`;
 const CRUD_API_KEY = process.env.CRUD_API_KEY || '';
 
 export const updateExpirationStatus = async (req: Request, res: Response) => {

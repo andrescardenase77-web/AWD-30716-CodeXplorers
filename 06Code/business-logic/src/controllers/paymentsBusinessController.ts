@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-const API_BASE_URL = `http://${process.env.CRUD_API_IP}:3000/fabuladental/payments`;
+const API_BASE_URL = `${process.env.CRUD_API_URL || 'https://fabuladental-crud.duckdns.org/fabuladental'}/payments`;
 const CRUD_API_KEY = process.env.CRUD_API_KEY || '';
 
 const calculateStatus = (payment: any): string => {

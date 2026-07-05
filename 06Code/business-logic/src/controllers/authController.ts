@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { tokenBlacklist } from '../middleware/checkRole';
 
-const CRUD_BASE_URL = `http://${process.env.CRUD_API_IP || 'localhost'}:3000`;
+const CRUD_API_URL = process.env.CRUD_API_URL || 'https://fabuladental-crud.duckdns.org/fabuladental';
 const CRUD_API_KEY = process.env.CRUD_API_KEY || '';
 
 export const login = async (req: Request, res: Response) => {
@@ -15,7 +15,7 @@ export const login = async (req: Request, res: Response) => {
 
   try {
     const crudResponse = await fetch(
-      `${CRUD_BASE_URL}/fabuladental/users/${encodeURIComponent(username)}`,
+      `${CRUD_API_URL}/users/${encodeURIComponent(username)}`,
       {
         headers: { 'x-api-key': CRUD_API_KEY },
       }
@@ -78,7 +78,7 @@ export const register = async (req: Request, res: Response) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const crudResponse = await fetch(`${CRUD_BASE_URL}/fabuladental/users`, {
+    const crudResponse = await fetch(`${CRUD_API_URL}/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
