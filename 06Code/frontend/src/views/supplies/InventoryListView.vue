@@ -1,11 +1,11 @@
 <template>
   <div class="admin-view">
-    <div class="d-flex justify-content-between align-items-start mb-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-3 mb-4">
       <div>
         <h1>Catálogo de Inventario</h1>
         <p class="admin-view__subtitle">Listado completo de insumos registrados en el sistema.</p>
       </div>
-      <RouterLink :to="{ name: 'supply-register' }" class="btn-primary-gradient">
+      <RouterLink :to="{ name: 'supply-register' }" class="btn-primary-gradient w-100 w-sm-auto text-center flex-shrink-0">
         <i class="bi bi-plus-lg"></i> Registrar Insumo
       </RouterLink>
     </div>
@@ -106,7 +106,7 @@
     </div>
 
     <div v-if="showEditModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5);">
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content card-surface border-0 p-3 shadow-lg">
           <div class="modal-header border-0 pb-0">
             <h5 class="fw-bold m-0" style="color: var(--color-text-primary);">Editar Insumo</h5>

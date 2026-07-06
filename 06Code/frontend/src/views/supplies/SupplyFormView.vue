@@ -90,13 +90,13 @@
               </div>
             </div>
 
-            <div class="d-flex gap-3">
-              <button type="submit" class="btn-primary-gradient" :disabled="submitting">
+            <div class="d-flex flex-column flex-sm-row gap-3">
+              <button type="submit" class="btn-primary-gradient w-100 text-center" :disabled="submitting">
                 <span v-if="submitting" class="spinner-ring me-1"></span>
                 <i v-else class="bi bi-floppy me-1"></i>
                 {{ submitting ? 'Guardando...' : 'Registrar Insumo' }}
               </button>
-              <button type="button" class="btn btn-outline-secondary" @click="resetForm">
+              <button type="button" class="btn btn-outline-secondary w-100" @click="resetForm">
                 Limpiar Formulario
               </button>
             </div>

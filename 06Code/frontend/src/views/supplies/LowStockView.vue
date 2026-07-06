@@ -1,11 +1,11 @@
 <template>
   <div class="admin-view">
-    <div class="d-flex justify-content-between align-items-start mb-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-3 mb-4">
       <div>
         <h1>Control de Stock Bajo</h1>
         <p class="admin-view__subtitle">Insumos con existencias por debajo del umbral crítico (≤ {{ THRESHOLD }} unidades).</p>
       </div>
-      <button class="btn btn-outline-secondary d-flex align-items-center gap-2" @click="fetchLowStock" :disabled="loading">
+      <button class="btn btn-outline-secondary d-flex align-items-center gap-2 flex-shrink-0" @click="fetchLowStock" :disabled="loading">
         <i class="bi bi-arrow-clockwise" :class="{ 'spin-icon': loading }"></i>
         Actualizar
       </button>

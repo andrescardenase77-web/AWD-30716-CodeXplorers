@@ -1,18 +1,50 @@
 <template>
-  <aside class="admin-sidebar">
-    <nav class="admin-sidebar__nav">
-      <RouterLink
-        v-for="link in navigationLinks"
-        :key="link.name"
-        :to="link.route"
-        class="admin-sidebar__link"
-        active-class="admin-sidebar__link--active"
-      >
-        <span class="admin-sidebar__link-icon" v-html="link.icon"></span>
-        <span class="admin-sidebar__link-label">{{ link.label }}</span>
-      </RouterLink>
-    </nav>
-  </aside>
+  <div>
+    <aside class="admin-sidebar d-none d-lg-block">
+      <nav class="admin-sidebar__nav">
+        <RouterLink
+          v-for="link in navigationLinks"
+          :key="link.name"
+          :to="link.route"
+          class="admin-sidebar__link"
+          active-class="admin-sidebar__link--active"
+        >
+          <span class="admin-sidebar__link-icon" v-html="link.icon"></span>
+          <span class="admin-sidebar__link-label">{{ link.label }}</span>
+        </RouterLink>
+      </nav>
+    </aside>
+
+    <div
+      id="adminSidebarOffcanvas"
+      class="offcanvas offcanvas-start d-lg-none"
+      tabindex="-1"
+      aria-labelledby="adminSidebarOffcanvasLabel"
+    >
+      <div class="offcanvas-header gradient-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-tooth text-white fs-4"></i>
+          <h5 id="adminSidebarOffcanvasLabel" class="text-white fw-bold m-0">Fábula Dental</h5>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+      </div>
+      <div class="offcanvas-body p-0">
+        <nav class="admin-sidebar__nav">
+          <RouterLink
+            v-for="link in navigationLinks"
+            :key="`mobile-${link.name}`"
+            :to="link.route"
+            class="admin-sidebar__link"
+            active-class="admin-sidebar__link--active"
+            data-bs-dismiss="offcanvas"
+          >
+            <span class="admin-sidebar__link-icon" v-html="link.icon"></span>
+            <span class="admin-sidebar__link-label">{{ link.label }}</span>
+          </RouterLink>
+        </nav>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
