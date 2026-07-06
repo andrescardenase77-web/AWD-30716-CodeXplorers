@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --color-primary-start: #0052cc;
+  --color-primary-end: #003d99;
+  --color-primary-gradient: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
+  --color-background: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-text-primary: #1a2b4a;
+  --color-text-secondary: #6b7c99;
+  --color-text-light: #ffffff;
+  --color-border: #dce4f0;
+  --color-danger: #e53e3e;
+  --color-success: #38a169;
+  --color-warning: #d69e2e;
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 20px;
+  --border-radius-xl: 28px;
+  --shadow-card: 0 4px 24px rgba(0, 82, 204, 0.10);
+  --shadow-elevated: 0 8px 40px rgba(0, 82, 204, 0.18);
+  --transition-base: 0.25s ease;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--color-primary-start);
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+a:hover {
+  color: var(--color-primary-end);
+}
+
+.btn-primary-gradient {
+  background: var(--color-primary-gradient);
+  color: var(--color-text-light);
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 0.65rem 1.75rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: opacity var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+  box-shadow: 0 4px 16px rgba(0, 82, 204, 0.30);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary-gradient:hover {
+  opacity: 0.92;
+  box-shadow: 0 6px 24px rgba(0, 82, 204, 0.38);
+  transform: translateY(-1px);
+  color: var(--color-text-light);
+}
+
+.btn-primary-gradient:active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.btn-primary-gradient:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.card-surface {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border);
+}
+
+.form-label-styled {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.form-input-styled {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  outline: none;
+}
+
+.form-input-styled:focus {
+  border-color: var(--color-primary-start);
+  box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.12);
+}
+
+.form-input-styled::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.alert-error {
+  background: #fff5f5;
+  border: 1.5px solid #fed7d7;
+  color: var(--color-danger);
+  border-radius: var(--border-radius-sm);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-background);
+}
+
+.gradient-header {
+  background: var(--color-primary-gradient);
+}
+
+.text-gradient {
+  background: var(--color-primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.spinner-ring {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.admin-view {
+  padding: 0.5rem 0;
+}
+
+.admin-view h1 {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.admin-view__subtitle {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
