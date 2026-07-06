@@ -36,7 +36,7 @@
             :to="link.route"
             class="admin-sidebar__link"
             active-class="admin-sidebar__link--active"
-            data-bs-dismiss="offcanvas"
+            @click="closeOffcanvas"
           >
             <span class="admin-sidebar__link-icon" v-html="link.icon"></span>
             <span class="admin-sidebar__link-label">{{ link.label }}</span>
@@ -48,6 +48,16 @@
 </template>
 
 <script setup>
+import { Offcanvas } from 'bootstrap'
+
+function closeOffcanvas() {
+  const el = document.getElementById('adminSidebarOffcanvas')
+  if (el) {
+    const instance = Offcanvas.getInstance(el)
+    if (instance) instance.hide()
+  }
+}
+
 const navigationLinks = [
   {
     name: 'dashboard',

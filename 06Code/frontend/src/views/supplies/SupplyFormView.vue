@@ -90,7 +90,7 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column flex-sm-row gap-3">
+            <div class="d-flex flex-column flex-md-row gap-3">
               <button type="submit" class="btn-primary-gradient w-100 text-center" :disabled="submitting">
                 <span v-if="submitting" class="spinner-ring me-1"></span>
                 <i v-else class="bi bi-floppy me-1"></i>

@@ -1,11 +1,11 @@
 <template>
   <div class="admin-view">
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-3 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
       <div>
         <h1>Control de Stock Bajo</h1>
         <p class="admin-view__subtitle">Insumos con existencias por debajo del umbral crítico (≤ {{ THRESHOLD }} unidades).</p>
       </div>
-      <button class="btn btn-outline-secondary d-flex align-items-center gap-2 flex-shrink-0" @click="fetchLowStock" :disabled="loading">
+      <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto flex-shrink-0" @click="fetchLowStock" :disabled="loading">
         <i class="bi bi-arrow-clockwise" :class="{ 'spin-icon': loading }"></i>
         Actualizar
       </button>
@@ -133,5 +133,11 @@ function getStatusLabel(status) {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@media (min-width: 768px) {
+  .w-md-auto {
+    width: auto !important;
+  }
 }
 </style>
