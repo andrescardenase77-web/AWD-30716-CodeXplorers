@@ -63,6 +63,16 @@ const routes = [
         path: 'loss-analysis',
         name: 'loss-analysis',
         component: () => import('@/views/supplies/LossAnalysisView.vue')
+      },
+      {
+        path: 'payments',
+        name: 'payments',
+        component: () => import('@/views/payments/PaymentListView.vue')
+      },
+      {
+        path: 'payment-register',
+        name: 'payment-register',
+        component: () => import('@/views/payments/PaymentFormView.vue')
       }
     ]
   },

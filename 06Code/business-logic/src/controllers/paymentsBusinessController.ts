@@ -22,13 +22,16 @@ export const getPaymentHistory = async (req: Request, res: Response) => {
     const payments = await response.json();
 
     const history = payments.map((payment: any) => ({
-      paymentID: String(payment.id),
+      id: String(payment.id),
       patientID: payment.patientID,
       amount: parseFloat(payment.amount),
-      status: calculateStatus(payment)
+      status: calculateStatus(payment),
+      date: payment.date,
+      paymentType: payment.paymentType,
+      paymentMethod: payment.paymentMethod
     }));
 
-    res.status(200).json(history);
+    res.status(200).json({ payments: history });
   } catch (error) {
     res.status(500).json({ error: "Unable to fetch payment history." });
   }
@@ -98,5 +101,77 @@ export const getPaymentsByPatient = async (req: Request, res: Response) => {
     });
   } catch (error) {
     return res.status(500).json({ error: "Failed to retrieve patient payment history." });
+  }
+};
+
+export const createPayment = async (req: Request, res: Response) => {
+  try {
+    const response = await fetch(API_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CRUD_API_KEY
+      },
+      body: JSON.stringify(req.body)
+    });
+    
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      return res.status(response.status).json({ error: err.error || "Error creating payment in CRUD API" });
+    }
+    
+    const data = await response.json();
+    return res.status(201).json({ success: true, data });
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to create payment." });
+  }
+};
+
+export const updatePayment = async (req: Request, res: Response) => {
+  try {
+    const paymentId = String(req.params.paymentId ?? '');
+    if (!paymentId) return res.status(400).json({ error: "Payment ID required." });
+
+    const response = await fetch(`${API_BASE_URL}/${paymentId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CRUD_API_KEY
+      },
+      body: JSON.stringify(req.body)
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      return res.status(response.status).json({ error: err.error || "Error updating payment in CRUD API" });
+    }
+
+    const data = await response.json();
+    return res.status(200).json({ success: true, data });
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to update payment." });
+  }
+};
+
+export const deletePayment = async (req: Request, res: Response) => {
+  try {
+    const paymentId = String(req.params.paymentId ?? '');
+    if (!paymentId) return res.status(400).json({ error: "Payment ID required." });
+
+    const response = await fetch(`${API_BASE_URL}?id=${paymentId}`, {
+      method: 'DELETE',
+      headers: {
+        'x-api-key': CRUD_API_KEY
+      }
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      return res.status(response.status).json({ error: err.error || "Error deleting payment in CRUD API" });
+    }
+
+    return res.status(200).json({ success: true, message: "Payment deleted successfully." });
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to delete payment." });
   }
 };
