@@ -56,29 +56,29 @@
         <table class="table table-hover align-middle mb-0">
           <thead style="background-color: var(--color-surface); border-bottom: 2px solid var(--color-border);">
             <tr>
-              <th class="py-3 ps-4 fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Cédula Paciente</th>
-              <th class="py-3 fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Detalle</th>
-              <th class="py-3 text-end fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Monto ($)</th>
-              <th class="py-3 fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Fecha</th>
-              <th class="py-3 fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Estado</th>
-              <th class="py-3 pe-4 fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Acciones</th>
+              <th class="py-3 text-center fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Cédula Paciente</th>
+              <th class="py-3 text-center fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Detalle</th>
+              <th class="py-3 text-center fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Monto ($)</th>
+              <th class="py-3 text-center fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Fecha</th>
+              <th class="py-3 text-center fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Estado</th>
+              <th class="py-3 text-center fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; color: var(--color-text-secondary); border-bottom: none;">Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="payment in filteredPayments" :key="payment.id">
-              <td class="ps-4 fw-semibold" style="color: var(--color-text-primary);">{{ payment.patientID }}</td>
-              <td>{{ getPaymentDetails(payment) }}</td>
-              <td class="text-end">
+              <td class="text-center fw-semibold" style="color: var(--color-text-primary);">{{ payment.patientID }}</td>
+              <td class="text-center">{{ getPaymentDetails(payment) }}</td>
+              <td class="text-center">
                 <span class="fw-semibold">${{ formatCurrency(payment.amount) }}</span>
               </td>
-              <td>{{ formatDate(payment.date) }}</td>
-              <td style="border-color: var(--color-border);">
+              <td class="text-center">{{ formatDate(payment.date) }}</td>
+              <td class="text-center" style="border-color: var(--color-border);">
                 <span :class="getStatusBadgeClass(payment.status)" class="badge fs-7 px-3 py-2 rounded-pill fw-semibold">
                   {{ payment.status === 'Completed' ? 'Completado' : (payment.status === 'Partial' ? 'Parcial' : payment.status) }}
                 </span>
               </td>
-              <td class="pe-4">
-                <div class="d-flex gap-2">
+              <td class="text-center">
+                <div class="d-flex justify-content-center gap-2">
                   <button
                     class="btn btn-outline-primary btn-sm"
                     @click="openEditModal(payment)"
