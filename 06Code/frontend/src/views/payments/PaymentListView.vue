@@ -119,9 +119,17 @@
               <div class="row g-3 mb-3">
                 <div class="col-sm-6">
                   <label class="form-label-styled">Tipo de Pago</label>
-                  <select v-model="editForm.paymentType" class="form-select form-input-styled" required>
-                    <option value="Deposit">Depósito</option>
-                    <option value="Final">Final</option>
+                  <select
+                    v-model="editForm.paymentType"
+                    class="form-select form-input-styled"
+                    :class="[
+                      editForm.paymentType === 'Deposit' ? 'text-warning-emphasis bg-warning bg-opacity-10 fw-semibold border-warning border-opacity-50' : '',
+                      editForm.paymentType === 'Final' ? 'text-success bg-success bg-opacity-10 fw-semibold border-success border-opacity-50' : ''
+                    ]"
+                    required
+                  >
+                    <option value="Deposit" class="fw-semibold" style="background-color: #fff3cd; color: #664d03;">Depósito (Parcial)</option>
+                    <option value="Final" class="fw-semibold" style="background-color: #d1e7dd; color: #0f5132;">Final (Completo)</option>
                   </select>
                 </div>
                 <div class="col-sm-6">
