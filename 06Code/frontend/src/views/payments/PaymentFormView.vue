@@ -74,12 +74,17 @@
                   id="paymentMethod"
                   v-model="form.paymentMethod"
                   class="form-select form-input-styled"
-                  :class="{ 'input-error': errors.paymentMethod }"
+                  :class="[
+                    { 'input-error': errors.paymentMethod },
+                    form.paymentMethod === 'Cash' ? 'text-primary-emphasis bg-primary bg-opacity-10 fw-semibold border-primary border-opacity-50' : '',
+                    form.paymentMethod === 'Card' ? 'text-info-emphasis bg-info bg-opacity-10 fw-semibold border-info border-opacity-50' : '',
+                    form.paymentMethod === 'Transfer' ? 'text-dark bg-dark bg-opacity-10 fw-semibold border-dark border-opacity-50' : ''
+                  ]"
                 >
-                  <option value="" disabled>Seleccione</option>
-                  <option value="Cash">Efectivo</option>
-                  <option value="Card">Tarjeta</option>
-                  <option value="Transfer">Transferencia</option>
+                  <option value="" disabled class="text-muted bg-white">Seleccione</option>
+                  <option value="Cash" class="fw-semibold" style="background-color: #cfe2ff; color: #084298;">Efectivo</option>
+                  <option value="Card" class="fw-semibold" style="background-color: #cff4fc; color: #055160;">Tarjeta</option>
+                  <option value="Transfer" class="fw-semibold" style="background-color: #e2e3e5; color: #41464b;">Transferencia</option>
                 </select>
                 <p v-if="errors.paymentMethod" class="field-error-msg mt-1">{{ errors.paymentMethod }}</p>
               </div>
