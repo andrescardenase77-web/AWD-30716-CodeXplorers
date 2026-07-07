@@ -73,7 +73,7 @@
               </td>
               <td class="text-center">{{ formatDate(payment.date) }}</td>
               <td class="text-center" style="border-color: var(--color-border);">
-                <span :class="getStatusBadgeClass(payment.status)" class="badge fs-7 px-3 py-2 rounded-pill fw-semibold">
+                <span :class="getStatusBadgeClass(payment.status)" class="badge fs-7 py-2 rounded-pill fw-semibold d-inline-flex justify-content-center align-items-center" style="width: 110px;">
                   {{ payment.status === 'Completed' ? 'Completado' : (payment.status === 'Partial' ? 'Parcial' : payment.status) }}
                 </span>
               </td>
