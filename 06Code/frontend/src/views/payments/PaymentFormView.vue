@@ -56,11 +56,15 @@
                   id="paymentType"
                   v-model="form.paymentType"
                   class="form-select form-input-styled"
-                  :class="{ 'input-error': errors.paymentType }"
+                  :class="[
+                    { 'input-error': errors.paymentType },
+                    form.paymentType === 'Deposit' ? 'text-warning-emphasis bg-warning bg-opacity-10 fw-semibold border-warning border-opacity-50' : '',
+                    form.paymentType === 'Final' ? 'text-success bg-success bg-opacity-10 fw-semibold border-success border-opacity-50' : ''
+                  ]"
                 >
-                  <option value="" disabled>Seleccione</option>
-                  <option value="Deposit">Depósito (Parcial)</option>
-                  <option value="Final">Final (Completo)</option>
+                  <option value="" disabled class="text-dark bg-white fw-normal">Seleccione</option>
+                  <option value="Deposit" class="text-dark bg-white fw-semibold">🟡 Depósito (Parcial)</option>
+                  <option value="Final" class="text-dark bg-white fw-semibold">🟢 Final (Completo)</option>
                 </select>
                 <p v-if="errors.paymentType" class="field-error-msg mt-1">{{ errors.paymentType }}</p>
               </div>
