@@ -103,10 +103,10 @@
             </div>
 
             <div class="d-flex flex-column flex-md-row gap-3">
-              <button type="submit" class="btn-primary-gradient w-100 text-center" :disabled="submitting">
-                <span v-if="submitting" class="spinner-ring me-1"></span>
-                <i v-else class="bi bi-floppy me-1"></i>
-                {{ submitting ? 'Guardando...' : 'Registrar Pago' }}
+              <button type="submit" class="btn btn-primary-gradient w-100 d-flex justify-content-center align-items-center gap-2 py-2 fw-semibold" :disabled="submitting">
+                <span v-if="submitting" class="spinner-ring"></span>
+                <i v-else class="bi bi-floppy"></i>
+                <span>{{ submitting ? 'Guardando...' : 'Registrar Pago' }}</span>
               </button>
               <button type="button" class="btn btn-outline-secondary w-100" @click="resetForm">
                 Limpiar Formulario
