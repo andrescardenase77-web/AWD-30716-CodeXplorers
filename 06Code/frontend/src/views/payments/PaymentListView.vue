@@ -114,7 +114,8 @@
             <form @submit.prevent="savePayment">
               <div class="mb-3">
                 <label class="form-label-styled">Cédula del Paciente</label>
-                <input type="text" v-model="editForm.patientID" class="form-input-styled" required />
+                <input type="text" v-model="editForm.patientID" class="form-input-styled" :class="{ 'input-error': editErrors.patientID }" required />
+                <p v-if="editErrors.patientID" class="field-error-msg mt-1">{{ editErrors.patientID }}</p>
               </div>
               <div class="row g-3 mb-3">
                 <div class="col-sm-6">
@@ -144,12 +145,14 @@
               <div class="row g-3 mb-3">
                 <div class="col-sm-12">
                   <label class="form-label-styled">Monto ($)</label>
-                  <input type="number" step="0.01" min="0" v-model.number="editForm.amount" class="form-input-styled" required />
+                  <input type="number" step="0.01" min="0" v-model.number="editForm.amount" class="form-input-styled" :class="{ 'input-error': editErrors.amount }" required />
+                  <p v-if="editErrors.amount" class="field-error-msg mt-1">{{ editErrors.amount }}</p>
                 </div>
               </div>
               <div class="mb-4">
                 <label class="form-label-styled">Fecha de Pago</label>
-                <input type="date" v-model="editForm.date" class="form-input-styled" required />
+                <input type="date" v-model="editForm.date" class="form-input-styled" :class="{ 'input-error': editErrors.date }" required />
+                <p v-if="editErrors.date" class="field-error-msg mt-1">{{ editErrors.date }}</p>
               </div>
               <div class="d-flex justify-content-end gap-2">
                 <button type="button" class="btn btn-outline-secondary" @click="closeEditModal">Cancelar</button>
@@ -204,11 +207,43 @@ const searchQuery = ref('')
 
 const showEditModal = ref(false)
 const editForm = ref({})
+const editErrors = ref({})
 const saving = ref(false)
 const deletingId = ref(null)
 
 const showDeleteModal = ref(false)
 const paymentToDelete = ref(null)
+
+const getTodayDate = () => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+}
+
+const validateEditForm = () => {
+  let isValid = true
+  editErrors.value = {}
+
+  if (!editForm.value.patientID || !/^[0-9]{10}$/.test(editForm.value.patientID)) {
+    editErrors.value.patientID = 'El ID del paciente debe tener 10 dígitos.'
+    isValid = false
+  }
+  if (editForm.value.amount === null || editForm.value.amount === '' || editForm.value.amount <= 0) {
+    editErrors.value.amount = 'Ingrese un monto válido mayor a 0.'
+    isValid = false
+  }
+  if (!editForm.value.date) {
+    editErrors.value.date = 'La fecha es obligatoria.'
+    isValid = false
+  } else {
+    const todayStr = getTodayDate()
+    if (editForm.value.date > todayStr) {
+      editErrors.value.date = 'La fecha de pago no puede ser en el futuro.'
+      isValid = false
+    }
+  }
+
+  return isValid
+}
 
 const fetchPayments = async () => {
   loading.value = true
@@ -274,9 +309,12 @@ const openEditModal = (payment) => {
 const closeEditModal = () => {
   showEditModal.value = false
   editForm.value = {}
+  editErrors.value = {}
 }
 
 const savePayment = async () => {
+  if (!validateEditForm()) return
+  
   saving.value = true
   try {
     const id = editForm.value.id
@@ -340,6 +378,17 @@ const confirmDelete = async () => {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+.input-error {
+  border-color: #ef4444;
+}
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+.field-error-msg {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-bottom: 0;
 }
 .form-label-styled {
   font-weight: 600;
