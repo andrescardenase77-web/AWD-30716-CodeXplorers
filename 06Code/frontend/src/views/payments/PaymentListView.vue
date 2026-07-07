@@ -5,7 +5,7 @@
         <h1>Gestión de Pagos</h1>
         <p class="admin-view__subtitle">Listado de pagos registrados en el sistema.</p>
       </div>
-      <RouterLink :to="{ name: 'payment-register' }" class="btn btn-primary-gradient w-100 w-md-auto text-center flex-shrink-0">
+      <RouterLink :to="{ name: 'payment-register' }" class="btn btn-primary-gradient d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold rounded-3 shadow-sm flex-shrink-0">
         <i class="bi bi-plus-lg"></i> Registrar Pago
       </RouterLink>
     </div>
@@ -47,7 +47,7 @@
         <i class="bi bi-wallet2" style="font-size: 3.5rem; color: var(--color-border);"></i>
         <h5 class="mt-3 fw-bold" style="color: var(--color-text-secondary);">No hay pagos registrados</h5>
         <p class="text-muted">La lista está vacía. Comienza registrando tu primer pago.</p>
-        <RouterLink :to="{ name: 'payment-register' }" class="btn btn-primary-gradient mt-2">
+        <RouterLink :to="{ name: 'payment-register' }" class="btn btn-primary-gradient d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold rounded-3 shadow-sm mt-3">
           <i class="bi bi-plus-lg"></i> Registrar Pago
         </RouterLink>
       </div>
