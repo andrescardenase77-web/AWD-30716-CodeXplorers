@@ -135,10 +135,19 @@
                 </div>
                 <div class="col-sm-6">
                   <label class="form-label-styled">Método</label>
-                  <select v-model="editForm.paymentMethod" class="form-select form-input-styled" required>
-                    <option value="Cash">Efectivo</option>
-                    <option value="Card">Tarjeta</option>
-                    <option value="Transfer">Transferencia</option>
+                  <select
+                    v-model="editForm.paymentMethod"
+                    class="form-select form-input-styled"
+                    :class="[
+                      editForm.paymentMethod === 'Cash' ? 'text-primary-emphasis bg-primary bg-opacity-10 fw-semibold border-primary border-opacity-50' : '',
+                      editForm.paymentMethod === 'Card' ? 'text-info-emphasis bg-info bg-opacity-10 fw-semibold border-info border-opacity-50' : '',
+                      editForm.paymentMethod === 'Transfer' ? 'text-dark bg-dark bg-opacity-10 fw-semibold border-dark border-opacity-50' : ''
+                    ]"
+                    required
+                  >
+                    <option value="Cash" class="fw-semibold" style="background-color: #cfe2ff; color: #084298;">Efectivo</option>
+                    <option value="Card" class="fw-semibold" style="background-color: #cff4fc; color: #055160;">Tarjeta</option>
+                    <option value="Transfer" class="fw-semibold" style="background-color: #e2e3e5; color: #41464b;">Transferencia</option>
                   </select>
                 </div>
               </div>
