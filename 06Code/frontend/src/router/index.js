@@ -17,7 +17,7 @@ const routes = [
   {
     path: '/admin',
     component: () => import('@/layouts/AdminLayout.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, role: 'Administrator' },
     children: [
       {
         path: 'dashboard',
@@ -63,6 +63,17 @@ const routes = [
         path: 'loss-analysis',
         name: 'loss-analysis',
         component: () => import('@/views/supplies/LossAnalysisView.vue')
+      }
+    ]
+  },
+  {
+    path: '/receptionist',
+    component: () => import('@/layouts/ReceptionistLayout.vue'),
+    meta: { requiresAuth: true, role: 'Receptionist' },
+    children: [
+      {
+        path: '',
+        redirect: '/receptionist/payments'
       },
       {
         path: 'payments',
@@ -93,13 +104,44 @@ const router = createRouter({
 router.beforeEach((to) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   const authenticated = authService.isAuthenticated()
+  const userRole = authService.retrieveRole()
+
+  if (authenticated && (!userRole || (userRole !== 'Administrator' && userRole !== 'Receptionist' && userRole !== 'Dentist'))) {
+    authService.removeToken()
+    authService.removeRole()
+    if (requiresAuth) {
+      return { name: 'login' }
+    }
+    return true
+  }
 
   if (requiresAuth && !authenticated) {
     return { name: 'login' }
   }
 
+  if (requiresAuth && authenticated) {
+    const requiredRole = to.matched.find((record) => record.meta.role)?.meta.role
+    if (requiredRole && requiredRole !== userRole) {
+      if (userRole === 'Receptionist') {
+        return { path: '/receptionist/payments' }
+      } else if (userRole === 'Administrator') {
+        return { path: '/admin/dashboard' }
+      } else if (userRole === 'Dentist') {
+        return { path: '/dentist/dashboard' }
+      } else {
+        return { name: 'login' }
+      }
+    }
+  }
+
   if (!requiresAuth && authenticated && (to.name === 'login' || to.name === 'landing')) {
-    return { name: 'dashboard' }
+    if (userRole === 'Receptionist') {
+      return { path: '/receptionist/payments' }
+    } else if (userRole === 'Administrator') {
+      return { path: '/admin/dashboard' }
+    } else if (userRole === 'Dentist') {
+      return { path: '/dentist/dashboard' }
+    }
   }
 
   return true

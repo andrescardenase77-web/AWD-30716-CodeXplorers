@@ -128,8 +128,13 @@ async function handleLoginSubmit() {
   errorMessage.value = ''
 
   try {
-    await authStore.login(credentials.value.username, credentials.value.password)
-    router.push({ name: 'dashboard' })
+    const result = await authStore.login(credentials.value.username, credentials.value.password)
+    const userRole = result?.role || authStore.role
+    if (userRole === 'Receptionist') {
+      router.push('/receptionist/payments')
+    } else {
+      router.push({ name: 'dashboard' })
+    }
   } catch (error) {
     const status = error?.status ?? 0
     errorMessage.value =

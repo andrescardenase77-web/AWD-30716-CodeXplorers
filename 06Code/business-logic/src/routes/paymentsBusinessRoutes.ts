@@ -11,12 +11,12 @@ import {
 
 const router = Router();
 
-router.get('/', checkRole(['Receptionist', 'Administrator']), getPaymentHistory);
-router.get('/:paymentId', checkRole(['Receptionist', 'Administrator']), getPaymentById);
-router.get('/patients/:patientId', checkRole(['Receptionist', 'Administrator']), getPaymentsByPatient);
+router.get('/', checkRole(['Receptionist']), getPaymentHistory);
+router.get('/:paymentId', checkRole(['Receptionist']), getPaymentById);
+router.get('/patients/:patientId', checkRole(['Receptionist']), getPaymentsByPatient);
 
-router.post('/', checkRole(['Receptionist', 'Administrator']), createPayment);
-router.put('/:paymentId', checkRole(['Receptionist', 'Administrator']), updatePayment);
-router.delete('/:paymentId', checkRole(['Receptionist', 'Administrator']), deletePayment);
+router.post('/', checkRole(['Receptionist']), createPayment);
+router.put('/:paymentId', checkRole(['Receptionist']), updatePayment);
+router.delete('/:paymentId', checkRole(['Receptionist']), deletePayment);
 
 export default router;

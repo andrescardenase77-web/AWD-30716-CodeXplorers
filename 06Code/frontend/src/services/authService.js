@@ -1,6 +1,7 @@
 import { blApi } from './http.js'
 
 const TOKEN_KEY = 'auth_token'
+const ROLE_KEY = 'auth_role'
 
 const authService = {
   async login(username, password) {
@@ -22,6 +23,18 @@ const authService = {
 
   removeToken() {
     localStorage.removeItem(TOKEN_KEY)
+  },
+
+  storeRole(role) {
+    localStorage.setItem(ROLE_KEY, role)
+  },
+
+  retrieveRole() {
+    return localStorage.getItem(ROLE_KEY)
+  },
+
+  removeRole() {
+    localStorage.removeItem(ROLE_KEY)
   },
 
   isAuthenticated() {
