@@ -88,6 +88,51 @@ const routes = [
     ]
   },
   {
+    path: '/dentist',
+    component: () => import('@/layouts/DentistLayout.vue'),
+    meta: { requiresAuth: true, role: 'Dentist' },
+    children: [
+      {
+        path: '',
+        redirect: '/dentist/patients'
+      },
+      {
+        path: 'patients',
+        name: 'patients',
+        component: () => import('@/views/patients/PatientListView.vue')
+      },
+      {
+        path: 'patient-register',
+        name: 'patient-register',
+        component: () => import('@/views/patients/PatientCreateView.vue')
+      },
+      {
+        path: 'pediatric-category',
+        name: 'pediatric-category',
+        component: () => import('@/views/patients/PatientRuleView.vue'),
+        meta: { ruleType: 'pediatric' }
+      },
+      {
+        path: 'birthday-check',
+        name: 'birthday-check',
+        component: () => import('@/views/patients/PatientRuleView.vue'),
+        meta: { ruleType: 'birthday' }
+      },
+      {
+        path: 'consultation-time',
+        name: 'consultation-time',
+        component: () => import('@/views/patients/PatientRuleView.vue'),
+        meta: { ruleType: 'consultation' }
+      },
+      {
+        path: 'legal-representative',
+        name: 'legal-representative',
+        component: () => import('@/views/patients/PatientRuleView.vue'),
+        meta: { ruleType: 'legal' }
+      }
+    ]
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/'
   }
@@ -127,7 +172,7 @@ router.beforeEach((to) => {
       } else if (userRole === 'Administrator') {
         return { path: '/admin/dashboard' }
       } else if (userRole === 'Dentist') {
-        return { path: '/dentist/dashboard' }
+        return { path: '/dentist/patients' }
       } else {
         return { name: 'login' }
       }
@@ -140,7 +185,7 @@ router.beforeEach((to) => {
     } else if (userRole === 'Administrator') {
       return { path: '/admin/dashboard' }
     } else if (userRole === 'Dentist') {
-      return { path: '/dentist/dashboard' }
+      return { path: '/dentist/patients' }
     }
   }
 
