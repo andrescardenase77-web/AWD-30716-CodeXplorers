@@ -61,37 +61,37 @@ function closeOffcanvas() {
 const navigationLinks = [
   {
     name: 'patients',
-    label: 'Patient Registry',
+    label: 'Registro de Pacientes',
     route: '/dentist/patients',
     icon: '<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4-3a4 4 0 100-8 4 4 0 000 8zm6 0a3 3 0 100-6 3 3 0 000 6z"/></svg>'
   },
   {
     name: 'patient-register',
-    label: 'New Patient',
+    label: 'Nuevo Paciente',
     route: '/dentist/patient-register',
     icon: '<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>'
   },
   {
     name: 'pediatric-category',
-    label: 'Pediatric Category',
+    label: 'Categoría Pediátrica',
     route: '/dentist/pediatric-category',
     icon: '<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14c3.866 0 7 1.79 7 4v1H5v-1c0-2.21 3.134-4 7-4zm0-2a4 4 0 100-8 4 4 0 000 8z"/></svg>'
   },
   {
     name: 'birthday-calculator',
-    label: 'Birthday Check',
+    label: 'Verificación de Cumpleaños',
     route: '/dentist/birthday-check',
     icon: '<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M5 11h14M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>'
   },
   {
     name: 'consultation-time',
-    label: 'Consultation Time',
+    label: 'Tiempo de Consulta',
     route: '/dentist/consultation-time',
     icon: '<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
   },
   {
     name: 'legal-representative',
-    label: 'Legal Representative',
+    label: 'Representante Legal',
     route: '/dentist/legal-representative',
     icon: '<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6a2 2 0 012-2z"/></svg>'
   }

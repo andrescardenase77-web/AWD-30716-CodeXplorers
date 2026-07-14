@@ -6,8 +6,8 @@
           <i class="bi bi-arrow-left"></i>
         </RouterLink>
         <div>
-          <h1 class="m-0">Register Patient</h1>
-          <p class="admin-view__subtitle m-0">Create a clinical record for dental care follow-up.</p>
+          <h1 class="m-0">Registrar Paciente</h1>
+          <p class="admin-view__subtitle m-0">Crea un expediente clínico para el seguimiento de atención dental.</p>
         </div>
       </div>
     </div>
@@ -29,46 +29,46 @@
           <form @submit.prevent="submitForm" novalidate>
             <div class="row g-3 mb-4">
               <div class="col-12 col-md-6">
-                <label class="form-label-styled">Patient ID</label>
+                <label class="form-label-styled">ID Paciente</label>
                 <input v-model="form.patientID" type="text" maxlength="10" class="form-input-styled" :class="{ 'input-error': errors.patientID }" placeholder="1712345678" />
                 <p v-if="errors.patientID" class="field-error-msg mt-1">{{ errors.patientID }}</p>
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label-styled">Full Name</label>
-                <input v-model="form.fullName" type="text" class="form-input-styled" :class="{ 'input-error': errors.fullName }" placeholder="First and last name" />
+                <label class="form-label-styled">Nombre Completo</label>
+                <input v-model="form.fullName" type="text" class="form-input-styled" :class="{ 'input-error': errors.fullName }" placeholder="Nombres y apellidos" />
                 <p v-if="errors.fullName" class="field-error-msg mt-1">{{ errors.fullName }}</p>
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label-styled">Birthday</label>
+                <label class="form-label-styled">Fecha de Nacimiento</label>
                 <input v-model="form.birthday" type="date" class="form-input-styled" :class="{ 'input-error': errors.birthday }" />
                 <p v-if="errors.birthday" class="field-error-msg mt-1">{{ errors.birthday }}</p>
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label-styled">Phone</label>
+                <label class="form-label-styled">Teléfono</label>
                 <input v-model="form.phone" type="text" maxlength="10" class="form-input-styled" :class="{ 'input-error': errors.phone }" placeholder="0987654321" />
                 <p v-if="errors.phone" class="field-error-msg mt-1">{{ errors.phone }}</p>
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label-styled">Gender</label>
+                <label class="form-label-styled">Género</label>
                 <select v-model="form.gender" class="form-select form-input-styled" :class="{ 'input-error': errors.gender }">
-                  <option value="">Select gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
+                  <option value="">Seleccionar género</option>
+                  <option value="male">Masculino</option>
+                  <option value="female">Femenino</option>
+                  <option value="other">Otro</option>
                 </select>
                 <p v-if="errors.gender" class="field-error-msg mt-1">{{ errors.gender }}</p>
               </div>
               <div class="col-12">
-                <label class="form-label-styled">Reason for Consultation</label>
-                <input v-model="form.reasonForConsultation" type="text" class="form-input-styled" :class="{ 'input-error': errors.reasonForConsultation }" placeholder="Brief clinical reason" />
+                <label class="form-label-styled">Motivo de Consulta</label>
+                <input v-model="form.reasonForConsultation" type="text" class="form-input-styled" :class="{ 'input-error': errors.reasonForConsultation }" placeholder="Motivo clínico breve" />
                 <p v-if="errors.reasonForConsultation" class="field-error-msg mt-1">{{ errors.reasonForConsultation }}</p>
               </div>
               <div class="col-12">
                 <label class="form-label-styled d-flex justify-content-between">
-                  <span>Legal Representative</span>
-                  <span v-if="requiresLegalRepresentative" class="badge bg-warning bg-opacity-10 text-warning-emphasis">Required for minors</span>
+                  <span>Representante Legal</span>
+                  <span v-if="requiresLegalRepresentative" class="badge bg-warning bg-opacity-10 text-warning-emphasis">Requerido para menores</span>
                 </label>
-                <input v-model="form.legalRepresentative" type="text" class="form-input-styled" :class="{ 'input-error': errors.legalRepresentative }" placeholder="Guardian full name if applicable" />
+                <input v-model="form.legalRepresentative" type="text" class="form-input-styled" :class="{ 'input-error': errors.legalRepresentative }" placeholder="Nombre completo del tutor si aplica" />
                 <p v-if="errors.legalRepresentative" class="field-error-msg mt-1">{{ errors.legalRepresentative }}</p>
               </div>
             </div>
@@ -77,10 +77,10 @@
               <button type="submit" class="btn btn-primary-gradient w-100 d-flex justify-content-center align-items-center gap-2 py-3 fw-bold shadow" :disabled="submitting">
                 <span v-if="submitting" class="spinner-ring"></span>
                 <i v-else class="bi bi-person-plus-fill fs-5"></i>
-                <span>{{ submitting ? 'Registering...' : 'Register Patient' }}</span>
+                <span>{{ submitting ? 'Registrando...' : 'Registrar Paciente' }}</span>
               </button>
               <button type="button" class="btn btn-outline-secondary px-4" @click="resetForm(false)">
-                Clear
+                Limpiar
               </button>
             </div>
           </form>
@@ -144,34 +144,34 @@ const validateForm = () => {
   resetErrors()
   let isValid = true
   if (!/^[0-9]{10}$/.test(form.patientID)) {
-    errors.patientID = 'Patient ID must contain 10 digits.'
+    errors.patientID = 'El ID del paciente debe contener 10 dígitos.'
     isValid = false
   }
   if (!form.fullName || form.fullName.trim().length < 3) {
-    errors.fullName = 'Full name must contain at least 3 characters.'
+    errors.fullName = 'El nombre completo debe tener al menos 3 caracteres.'
     isValid = false
   }
   if (!form.birthday) {
-    errors.birthday = 'Birthday is required.'
+    errors.birthday = 'La fecha de nacimiento es obligatoria.'
     isValid = false
   } else if (new Date(form.birthday) > new Date()) {
-    errors.birthday = 'Birthday cannot be in the future.'
+    errors.birthday = 'La fecha de nacimiento no puede ser en el futuro.'
     isValid = false
   }
   if (!/^[0-9]{10}$/.test(form.phone)) {
-    errors.phone = 'Phone must contain 10 digits.'
+    errors.phone = 'El teléfono debe contener 10 dígitos.'
     isValid = false
   }
   if (!form.gender) {
-    errors.gender = 'Gender is required.'
+    errors.gender = 'El género es obligatorio.'
     isValid = false
   }
   if (!form.reasonForConsultation || form.reasonForConsultation.trim().length < 5) {
-    errors.reasonForConsultation = 'Reason must contain at least 5 characters.'
+    errors.reasonForConsultation = 'El motivo debe contener al menos 5 caracteres.'
     isValid = false
   }
   if (requiresLegalRepresentative.value && !form.legalRepresentative.trim()) {
-    errors.legalRepresentative = 'Legal representative is required for minors.'
+    errors.legalRepresentative = 'El representante legal es obligatorio para menores de edad.'
     isValid = false
   }
   return isValid
@@ -199,7 +199,7 @@ const submitForm = async () => {
   submitting.value = true
   try {
     await createPatient({ ...form })
-    successMessage.value = 'Patient registered successfully.'
+    successMessage.value = 'Paciente registrado correctamente.'
     resetForm(true)
   } catch (error) {
     errorMessage.value = error.message

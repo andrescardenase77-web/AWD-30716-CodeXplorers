@@ -15,12 +15,12 @@
         <i class="bi bi-tooth text-white fs-3"></i>
         <span class="fs-5 fw-bold text-white text-nowrap">Fabula Dental</span>
       </div>
-      <span class="admin-navbar__greeting d-none d-sm-inline">Welcome, Dentist</span>
+      <span class="admin-navbar__greeting d-none d-sm-inline">Bienvenido, Dentista</span>
       <button id="dentist-logout-btn" class="admin-navbar__logout" @click="handleLogout">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
         </svg>
-        <span class="d-none d-sm-inline">Sign Out</span>
+        <span class="d-none d-sm-inline">Cerrar Sesión</span>
       </button>
     </div>
   </header>
