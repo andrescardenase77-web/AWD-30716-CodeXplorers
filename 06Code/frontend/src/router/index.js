@@ -84,6 +84,18 @@ const routes = [
         path: 'payment-register',
         name: 'payment-register',
         component: () => import('@/views/payments/PaymentFormView.vue')
+      },
+      {
+        path: 'senior-discount',
+        name: 'senior-discount',
+        component: () => import('@/views/patients/PatientRuleView.vue'),
+        meta: { ruleType: 'senior' }
+      },
+      {
+        path: 'contact-priority',
+        name: 'contact-priority',
+        component: () => import('@/views/patients/PatientRuleView.vue'),
+        meta: { ruleType: 'priority' }
       }
     ]
   },

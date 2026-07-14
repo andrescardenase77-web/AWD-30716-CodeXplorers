@@ -5,14 +5,43 @@
         <h1>{{ config.title }}</h1>
         <p class="admin-view__subtitle">{{ config.subtitle }}</p>
       </div>
-      <RouterLink :to="{ name: 'patients' }" class="btn btn-light d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold rounded-3 shadow-sm">
-        <i class="bi bi-arrow-left"></i> Registro
+      <RouterLink :to="backRoute" class="btn btn-light d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold rounded-3 shadow-sm">
+        <i class="bi bi-arrow-left"></i> {{ backLabel }}
       </RouterLink>
     </div>
 
     <div class="row g-4">
       <div class="col-12 col-lg-5">
         <div class="card-surface p-4 p-md-5 h-100">
+          <!-- Autocomplete/Selector de Paciente -->
+          <div class="mb-4 pb-4 border-bottom">
+            <label class="form-label-styled fw-bold text-primary mb-2">
+              <i class="bi bi-people-fill me-1"></i> Seleccionar Paciente Registrado
+            </label>
+            <div v-if="loadingPatients" class="d-flex align-items-center gap-2 text-muted small py-2">
+              <span class="spinner-border spinner-border-sm" role="status"></span>
+              <span>Cargando lista de pacientes...</span>
+            </div>
+            <select 
+              v-else 
+              v-model="selectedPatientId" 
+              class="form-select form-input-styled bg-light border"
+              @change="handlePatientChange"
+            >
+              <option value="">-- Autocompletar con un paciente de la base de datos --</option>
+              <option 
+                v-for="p in patients" 
+                :key="p.patientID" 
+                :value="p.patientID"
+              >
+                {{ p.fullName }} (ID: {{ p.patientID }})
+              </option>
+            </select>
+            <div class="form-text text-muted mt-1 small">
+              Selecciona un paciente para cargar automáticamente sus datos de la base de datos y realizar el cálculo de forma dinámica.
+            </div>
+          </div>
+
           <form @submit.prevent="runRule" novalidate>
             <div class="d-flex flex-column gap-3 mb-4">
               <div v-for="field in config.fields" :key="field.key">
@@ -72,15 +101,27 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { runPatientRule } from '@/services/patientService.js'
+import { runPatientRule, getPatients } from '@/services/patientService.js'
+import authService from '@/services/authService.js'
 
 const route = useRoute()
 const loading = ref(false)
+const loadingPatients = ref(false)
 const errorMessage = ref('')
 const result = ref(null)
 const form = reactive({})
+const patients = ref([])
+const selectedPatientId = ref('')
+
+const userRole = authService.retrieveRole()
+const backRoute = computed(() => {
+  return userRole === 'Receptionist' ? { name: 'payments' } : { name: 'patients' }
+})
+const backLabel = computed(() => {
+  return userRole === 'Receptionist' ? 'Pagos' : 'Registro'
+})
 
 const ruleConfigs = {
   pediatric: {
@@ -89,7 +130,7 @@ const ruleConfigs = {
     action: 'Calcular Categoría',
     icon: 'bi bi-person-heart fs-5',
     path: 'pediatric-category',
-    emptyText: 'Ingrese la fecha de nacimiento para clasificar al paciente.',
+    emptyText: 'Seleccione un paciente o ingrese la fecha de nacimiento para clasificar al paciente.',
     fields: [
       { key: 'birthday', label: 'Fecha de Nacimiento', type: 'date' }
     ],
@@ -105,7 +146,7 @@ const ruleConfigs = {
     action: 'Verificar Cumpleaños',
     icon: 'bi bi-calendar-heart fs-5',
     path: 'days-to-birthday',
-    emptyText: 'Ingrese la fecha de nacimiento para calcular el próximo cumpleaños.',
+    emptyText: 'Seleccione un paciente o ingrese la fecha de nacimiento para calcular el próximo cumpleaños.',
     fields: [
       { key: 'birthday', label: 'Fecha de Nacimiento', type: 'date' }
     ],
@@ -120,7 +161,7 @@ const ruleConfigs = {
     action: 'Estimar Tiempo',
     icon: 'bi bi-clock-history fs-5',
     path: 'consultation-time-estimation',
-    emptyText: 'Ingrese los datos de edad y motivo clínico para estimar el tiempo de la cita.',
+    emptyText: 'Seleccione un paciente o ingrese los datos para estimar el tiempo de la cita.',
     fields: [
       { key: 'birthday', label: 'Fecha de Nacimiento', type: 'date' },
       { key: 'reasonForConsultation', label: 'Motivo de Consulta', type: 'textarea', placeholder: 'Describa el motivo de la consulta' }
@@ -136,7 +177,7 @@ const ruleConfigs = {
     action: 'Validar Requisito',
     icon: 'bi bi-shield-check fs-5',
     path: 'legal-representative-validation',
-    emptyText: 'Ingrese la fecha de nacimiento y el nombre del tutor cuando aplique.',
+    emptyText: 'Seleccione un paciente o ingrese los datos del tutor cuando aplique.',
     fields: [
       { key: 'birthday', label: 'Fecha de Nacimiento', type: 'date' },
       { key: 'legalRepresentative', label: 'Representante Legal', type: 'text', placeholder: 'Nombre completo del tutor' }
@@ -144,6 +185,37 @@ const ruleConfigs = {
     mapResult: (data) => [
       { label: 'Representante Requerido', value: data.requiresLegalRepresentative ? 'Requerido' : 'No Requerido', tone: data.requiresLegalRepresentative ? 'warning' : 'success' },
       { label: 'Mensaje de Validación', value: data.message }
+    ]
+  },
+  senior: {
+    title: 'Descuento de Adulto Mayor',
+    subtitle: 'Calcula el porcentaje de descuento sugerido para la tercera edad.',
+    action: 'Calcular Descuento',
+    icon: 'bi bi-percent fs-5',
+    path: 'senior-discount',
+    emptyText: 'Seleccione un paciente o ingrese la fecha de nacimiento para verificar el descuento.',
+    fields: [
+      { key: 'birthday', label: 'Fecha de Nacimiento', type: 'date' }
+    ],
+    mapResult: (data) => [
+      { label: 'Elegible para Descuento', value: data.isEligibleForDiscount ? 'Sí' : 'No', tone: data.isEligibleForDiscount ? 'success' : 'danger' },
+      { label: 'Descuento Sugerido', value: `${(data.suggestedDiscountFactor * 100).toFixed(0)}%`, tone: 'primary' }
+    ]
+  },
+  priority: {
+    title: 'Prioridad de Contacto',
+    subtitle: 'Establece la prioridad de atención y llamada al paciente según síntomas.',
+    action: 'Calcular Prioridad',
+    icon: 'bi bi-telephone-exclamation fs-5',
+    path: 'contact-priority',
+    emptyText: 'Seleccione un paciente o ingrese el teléfono y motivo clínico para calcular la prioridad.',
+    fields: [
+      { key: 'phone', label: 'Teléfono', type: 'text', placeholder: 'Teléfono del paciente (10 dígitos)' },
+      { key: 'reasonForConsultation', label: 'Motivo de Consulta', type: 'textarea', placeholder: 'Describa el motivo de la consulta' }
+    ],
+    mapResult: (data) => [
+      { label: 'Puntaje de Prioridad', value: `${data.contactPriorityScore} puntos`, tone: 'primary' },
+      { label: 'Atención Inmediata', value: data.requiresImmediateAttention ? 'Requerida' : 'No Requerida', tone: data.requiresImmediateAttention ? 'danger' : 'success' }
     ]
   }
 }
@@ -162,7 +234,50 @@ const resetForm = () => {
   errorMessage.value = ''
 }
 
-watch(() => route.meta.ruleType, resetForm, { immediate: true })
+const fetchPatientsData = async () => {
+  loadingPatients.value = true
+  try {
+    patients.value = await getPatients()
+  } catch (error) {
+    console.error('Error al cargar la lista de pacientes:', error)
+  } finally {
+    loadingPatients.value = false
+  }
+}
+
+onMounted(() => {
+  fetchPatientsData()
+})
+
+const handlePatientChange = () => {
+  if (!selectedPatientId.value) {
+    resetForm()
+    return
+  }
+
+  const patient = patients.value.find(p => String(p.patientID) === String(selectedPatientId.value))
+  if (patient) {
+    config.value.fields.forEach((field) => {
+      if (field.key === 'birthday' && patient.birthday) {
+        form.birthday = String(patient.birthday).slice(0, 10)
+      } else if (field.key === 'reasonForConsultation') {
+        form.reasonForConsultation = patient.reasonForConsultation || ''
+      } else if (field.key === 'legalRepresentative') {
+        form.legalRepresentative = patient.legalRepresentative || ''
+      } else if (field.key === 'phone') {
+        form.phone = patient.phone || ''
+      }
+    })
+
+    // Ejecutar el cálculo inmediatamente para que sea dinámico
+    runRule()
+  }
+}
+
+watch(() => route.meta.ruleType, () => {
+  resetForm()
+  selectedPatientId.value = ''
+}, { immediate: true })
 
 const validateForm = () => {
   return config.value.fields.every((field) => {
