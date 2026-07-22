@@ -9,6 +9,11 @@
         <button class="btn btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold rounded-3 shadow-sm bg-white" @click="fetchPatients">
           <i class="bi bi-arrow-clockwise"></i> Actualizar
         </button>
+        <button class="btn btn-outline-success d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold rounded-3 shadow-sm bg-white" :disabled="sendingReminders" @click="triggerBirthdayReminders">
+          <span v-if="sendingReminders" class="spinner-border spinner-border-sm"></span>
+          <i v-else class="bi bi-whatsapp"></i>
+          {{ sendingReminders ? 'Enviando...' : 'Recordatorios de Cumpleaños' }}
+        </button>
         <RouterLink :to="{ name: 'patient-register' }" class="btn btn-primary-gradient d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold rounded-3 shadow-sm">
           <i class="bi bi-plus-lg"></i> Nuevo Paciente
         </RouterLink>
@@ -60,6 +65,39 @@
     <div v-if="errorMessage" class="alert alert-danger d-flex align-items-center mb-4 shadow-sm" role="alert">
       <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
       {{ errorMessage }}
+    </div>
+
+    <div v-if="reminderResult" class="card-surface p-3 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="fw-bold mb-0"><i class="bi bi-whatsapp text-success me-1"></i> Resultado de Recordatorios de Cumpleaños</h6>
+        <button type="button" class="btn-close" @click="reminderResult = null"></button>
+      </div>
+      <p class="mb-2 text-muted">
+        Enviados: <strong class="text-dark">{{ reminderResult.remindersSent }}</strong>
+        de <strong class="text-dark">{{ reminderResult.results?.length || 0 }}</strong> paciente(s) que cumplen años hoy.
+      </p>
+      <div v-if="reminderResult.results?.length" class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in reminderResult.results" :key="item.patientID">
+              <td>{{ item.patientID }}</td>
+              <td>{{ item.fullName }}</td>
+              <td>
+                <span v-if="item.sent" class="badge bg-success">Enviado</span>
+                <span v-else class="badge bg-danger" :title="item.error">No enviado</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p v-else class="text-muted mb-0 small">No hay pacientes que cumplan años hoy.</p>
     </div>
 
     <div class="card-surface p-3 mb-4">
@@ -193,7 +231,7 @@
 
 <script setup>
 import { computed, defineComponent, h, onMounted, reactive, ref } from 'vue'
-import { deletePatient, getPatients, updatePatient } from '@/services/patientService.js'
+import { deletePatient, getPatients, sendBirthdayReminders, updatePatient } from '@/services/patientService.js'
 
 const PatientFormFields = defineComponent({
   props: {
@@ -243,6 +281,8 @@ const ageFilter = ref('all')
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const patientToDelete = ref(null)
+const sendingReminders = ref(false)
+const reminderResult = ref(null)
 
 const editForm = reactive({
   patientID: '',
@@ -278,6 +318,19 @@ const fetchPatients = async () => {
 }
 
 onMounted(fetchPatients)
+
+const triggerBirthdayReminders = async () => {
+  errorMessage.value = ''
+  reminderResult.value = null
+  sendingReminders.value = true
+  try {
+    reminderResult.value = await sendBirthdayReminders()
+  } catch (error) {
+    errorMessage.value = error.message
+  } finally {
+    sendingReminders.value = false
+  }
+}
 
 const getAge = (birthday) => {
   if (!birthday) return null

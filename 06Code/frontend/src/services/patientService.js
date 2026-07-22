@@ -50,3 +50,21 @@ export async function runPatientRule(rulePath, payload) {
     throw new Error(getErrorMessage(error, 'Unable to process patient rule.'))
   }
 }
+
+export async function validateCedula(cedula) {
+  try {
+    const response = await blApi.post(`${PATIENTS_PATH}/validate-cedula`, { cedula })
+    return response.data
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'No se pudo validar la cédula.'))
+  }
+}
+
+export async function sendBirthdayReminders() {
+  try {
+    const response = await blApi.post(`${PATIENTS_PATH}/birthday-reminders`, {})
+    return response.data
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'No se pudieron enviar los recordatorios de cumpleaños.'))
+  }
+}

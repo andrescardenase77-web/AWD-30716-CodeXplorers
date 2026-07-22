@@ -6,7 +6,9 @@ import {
   calculateDaysToBirthday,
   calculateSeniorDiscount,
   estimateConsultationTime,
-  calculateContactPriority
+  calculateContactPriority,
+  validateCedula,
+  sendBirthdayReminders
 } from '../controllers/patientsBusinessController';
 
 const router = Router();
@@ -17,5 +19,7 @@ router.post('/days-to-birthday', checkRole(['Dentist']), calculateDaysToBirthday
 router.post('/senior-discount', checkRole(['Receptionist']), calculateSeniorDiscount);
 router.post('/consultation-time-estimation', checkRole(['Dentist']), estimateConsultationTime);
 router.post('/contact-priority', checkRole(['Receptionist']), calculateContactPriority);
+router.post('/validate-cedula', checkRole(['Receptionist']), validateCedula);
+router.post('/birthday-reminders', checkRole(['Receptionist']), sendBirthdayReminders);
 
 export default router;

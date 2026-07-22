@@ -29,9 +29,30 @@
           <form @submit.prevent="submitForm" novalidate>
             <div class="row g-3 mb-4">
               <div class="col-12 col-md-6">
-                <label class="form-label-styled">ID Paciente</label>
-                <input v-model="form.patientID" type="text" maxlength="10" class="form-input-styled" :class="{ 'input-error': errors.patientID }" placeholder="1712345678" />
+                <label class="form-label-styled">ID Paciente (Cédula)</label>
+                <div class="input-group">
+                  <input v-model="form.patientID" type="text" maxlength="10" class="form-input-styled" :class="{ 'input-error': errors.patientID }" placeholder="1712345678" @input="cedulaCheck = null" />
+                  <button type="button" class="btn btn-outline-primary" :disabled="validatingCedula || form.patientID.length !== 10" @click="checkCedula">
+                    <span v-if="validatingCedula" class="spinner-border spinner-border-sm"></span>
+                    <span v-else><i class="bi bi-patch-check"></i> Validar</span>
+                  </button>
+                </div>
                 <p v-if="errors.patientID" class="field-error-msg mt-1">{{ errors.patientID }}</p>
+                <div v-if="cedulaCheck" class="mt-2 p-2 rounded-3 small" :class="cedulaCheck.isValid ? 'bg-success bg-opacity-10 text-success-emphasis' : 'bg-danger bg-opacity-10 text-danger-emphasis'">
+                  <div class="fw-bold d-flex align-items-center gap-1">
+                    <i :class="cedulaCheck.isValid ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'"></i>
+                    {{ cedulaCheck.isValid ? 'Cédula válida' : 'Cédula inválida' }}
+                  </div>
+                  <div v-if="cedulaCheck.reason">{{ cedulaCheck.reason }}</div>
+                  <div v-if="cedulaCheck.isValid" class="mt-1 text-muted">
+                    <i class="bi bi-bank"></i>
+                    Registro SRI:
+                    <span v-if="cedulaCheck.sriLookup?.checked">
+                      {{ cedulaCheck.sriLookup.registeredAsTaxpayer ? 'Encontrado como contribuyente (RUC)' : 'No registrado como contribuyente (normal si no tiene RUC)' }}
+                    </span>
+                    <span v-else>No se pudo consultar el servicio del SRI en este momento.</span>
+                  </div>
+                </div>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label-styled">Nombre Completo</label>
@@ -92,11 +113,13 @@
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
-import { createPatient } from '@/services/patientService.js'
+import { createPatient, validateCedula } from '@/services/patientService.js'
 
 const successMessage = ref('')
 const errorMessage = ref('')
 const submitting = ref(false)
+const validatingCedula = ref(false)
+const cedulaCheck = ref(null)
 
 const form = reactive({
   patientID: '',
@@ -133,6 +156,18 @@ const requiresLegalRepresentative = computed(() => {
   const age = getAge(form.birthday)
   return age !== null && age < 18
 })
+
+const checkCedula = async () => {
+  cedulaCheck.value = null
+  validatingCedula.value = true
+  try {
+    cedulaCheck.value = await validateCedula(form.patientID)
+  } catch (error) {
+    cedulaCheck.value = { isValid: false, reason: error.message }
+  } finally {
+    validatingCedula.value = false
+  }
+}
 
 const resetErrors = () => {
   Object.keys(errors).forEach((key) => {
@@ -186,6 +221,7 @@ const resetForm = (keepMessages = false) => {
   form.reasonForConsultation = ''
   form.legalRepresentative = ''
   resetErrors()
+  cedulaCheck.value = null
   if (!keepMessages) {
     successMessage.value = ''
     errorMessage.value = ''
