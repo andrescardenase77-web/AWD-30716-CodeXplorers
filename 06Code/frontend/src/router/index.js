@@ -15,6 +15,12 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/register',
+    name: 'register',
+    component: () => import('@/views/core/RegisterView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/admin',
     component: () => import('@/layouts/AdminLayout.vue'),
     meta: { requiresAuth: true, role: 'Administrator' },
@@ -191,7 +197,7 @@ router.beforeEach((to) => {
     }
   }
 
-  if (!requiresAuth && authenticated && (to.name === 'login' || to.name === 'landing')) {
+  if (!requiresAuth && authenticated && (to.name === 'login' || to.name === 'landing' || to.name === 'register')) {
     if (userRole === 'Receptionist') {
       return { path: '/receptionist/payments' }
     } else if (userRole === 'Administrator') {
