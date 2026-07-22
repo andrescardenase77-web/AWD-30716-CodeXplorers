@@ -21,6 +21,12 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/public/supply/:id',
+    name: 'public-supply',
+    component: () => import('@/views/supplies/SupplyPublicView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/admin',
     component: () => import('@/layouts/AdminLayout.vue'),
     meta: { requiresAuth: true, role: 'Administrator' },
@@ -46,9 +52,9 @@ const routes = [
         component: () => import('@/views/supplies/LowStockView.vue')
       },
       {
-        path: 'restock-planning',
-        name: 'restock-planning',
-        component: () => import('@/views/supplies/RestockPlanningView.vue')
+        path: 'qr-generator',
+        name: 'qr-generator',
+        component: () => import('@/views/supplies/QrGeneratorView.vue')
       },
       {
         path: 'restock-budget',

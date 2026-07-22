@@ -82,6 +82,14 @@
               </td>
               <td class="pe-4">
                 <div class="d-flex gap-2">
+                  <RouterLink
+                    :to="{ name: 'qr-generator', query: { supplyId: supply.id } }"
+                    class="btn btn-outline-secondary btn-sm"
+                    title="Generar QR"
+                  >
+                    <i class="bi bi-qr-code"></i>
+                    QR
+                  </RouterLink>
                   <button
                     class="btn btn-outline-primary btn-sm"
                     @click="openEditModal(supply)"
