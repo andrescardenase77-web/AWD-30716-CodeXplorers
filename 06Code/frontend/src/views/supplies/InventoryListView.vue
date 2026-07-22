@@ -27,6 +27,7 @@
           <i class="bi bi-search text-muted"></i>
         </span>
         <input
+          ref="searchInputRef"
           type="text"
           v-model="searchQuery"
           class="form-control border-start-0"
@@ -81,6 +82,14 @@
               </td>
               <td class="pe-4">
                 <div class="d-flex gap-2">
+                  <RouterLink
+                    :to="{ name: 'qr-generator', query: { supplyId: supply.id } }"
+                    class="btn btn-outline-secondary btn-sm"
+                    title="Generar QR"
+                  >
+                    <i class="bi bi-qr-code"></i>
+                    QR
+                  </RouterLink>
                   <button
                     class="btn btn-outline-primary btn-sm"
                     @click="openEditModal(supply)"
@@ -155,8 +164,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { crudApi } from '@/services/http.js'
+import { fromEvent, map, debounceTime, distinctUntilChanged } from 'rxjs'
 
 const supplies = ref([])
 const loading = ref(true)
@@ -164,6 +174,10 @@ const deletingId = ref(null)
 const successMessage = ref('')
 const errorMessage = ref('')
 const searchQuery = ref('')
+const debouncedQuery = ref('')
+const searchInputRef = ref(null)
+let searchSubscription = null
+
 const showEditModal = ref(false)
 const saving = ref(false)
 const editingSupplyId = ref(null)
@@ -176,12 +190,38 @@ const editForm = ref({
 })
 
 const filteredSupplies = computed(() => {
-  if (!searchQuery.value.trim()) return supplies.value
-  const query = searchQuery.value.toLowerCase()
+  if (!debouncedQuery.value.trim()) return supplies.value
+  const query = debouncedQuery.value.toLowerCase()
   return supplies.value.filter((s) => s.supplyName.toLowerCase().includes(query))
 })
 
-onMounted(fetchSupplies)
+watch(searchInputRef, (el) => {
+  if (el) {
+    const searchInput$ = fromEvent(el, 'input').pipe(
+      map((e) => e.target.value.trim()),
+      debounceTime(300),
+      distinctUntilChanged()
+    )
+    searchSubscription = searchInput$.subscribe((query) => {
+      debouncedQuery.value = query
+    })
+  } else {
+    if (searchSubscription) {
+      searchSubscription.unsubscribe()
+      searchSubscription = null
+    }
+  }
+})
+
+onMounted(() => {
+  fetchSupplies()
+})
+
+onUnmounted(() => {
+  if (searchSubscription) {
+    searchSubscription.unsubscribe()
+  }
+})
 
 async function fetchSupplies() {
   loading.value = true

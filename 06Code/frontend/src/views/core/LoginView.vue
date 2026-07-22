@@ -85,6 +85,17 @@
             <span v-if="isLoading" class="spinner-ring"></span>
             <span>{{ isLoading ? 'Verificando...' : 'Ingresar' }}</span>
           </button>
+
+          <button
+            type="button"
+            class="btn btn-outline-primary w-100"
+            style="border-radius: 10px; padding: 0.8rem; font-weight: 700;"
+            @click="router.push({ name: 'register' })"
+            id="login-register-btn"
+            :disabled="isLoading"
+          >
+            Crear nuevo usuario
+          </button>
         </form>
 
         <div class="login-footer-link">

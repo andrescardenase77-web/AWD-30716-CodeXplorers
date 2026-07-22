@@ -15,6 +15,18 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/register',
+    name: 'register',
+    component: () => import('@/views/core/RegisterView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/public/supply/:id',
+    name: 'public-supply',
+    component: () => import('@/views/supplies/SupplyPublicView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/admin',
     component: () => import('@/layouts/AdminLayout.vue'),
     meta: { requiresAuth: true, role: 'Administrator' },
@@ -40,9 +52,9 @@ const routes = [
         component: () => import('@/views/supplies/LowStockView.vue')
       },
       {
-        path: 'restock-planning',
-        name: 'restock-planning',
-        component: () => import('@/views/supplies/RestockPlanningView.vue')
+        path: 'qr-generator',
+        name: 'qr-generator',
+        component: () => import('@/views/supplies/QrGeneratorView.vue')
       },
       {
         path: 'restock-budget',
@@ -191,7 +203,7 @@ router.beforeEach((to) => {
     }
   }
 
-  if (!requiresAuth && authenticated && (to.name === 'login' || to.name === 'landing')) {
+  if (!requiresAuth && authenticated && (to.name === 'login' || to.name === 'landing' || to.name === 'register')) {
     if (userRole === 'Receptionist') {
       return { path: '/receptionist/payments' }
     } else if (userRole === 'Administrator') {

@@ -64,8 +64,8 @@
           <h5 class="fw-bold mb-1" style="color: var(--color-text-primary);">Accesos Rápidos</h5>
           <p class="admin-view__subtitle mb-3">Navega directamente a los módulos de análisis.</p>
           <div class="d-flex flex-wrap gap-2">
-            <RouterLink :to="{ name: 'restock-planning' }" class="btn btn-outline-primary btn-sm fw-semibold">
-              <i class="bi bi-cart-check me-1"></i> Planificación de Reabastecimiento
+            <RouterLink :to="{ name: 'qr-generator' }" class="btn btn-outline-primary btn-sm fw-semibold">
+              <i class="bi bi-qr-code-scan me-1"></i> Generador de Códigos QR
             </RouterLink>
             <RouterLink :to="{ name: 'restock-budget' }" class="btn btn-outline-primary btn-sm fw-semibold">
               <i class="bi bi-wallet2 me-1"></i> Presupuesto de Compra
