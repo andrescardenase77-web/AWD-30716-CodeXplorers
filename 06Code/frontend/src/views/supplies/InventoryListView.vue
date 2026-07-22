@@ -156,7 +156,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { crudApi } from '@/services/http.js'
 import { fromEvent, map, debounceTime, distinctUntilChanged } from 'rxjs'
 
@@ -187,10 +187,9 @@ const filteredSupplies = computed(() => {
   return supplies.value.filter((s) => s.supplyName.toLowerCase().includes(query))
 })
 
-onMounted(() => {
-  fetchSupplies()
-  if (searchInputRef.value) {
-    const searchInput$ = fromEvent(searchInputRef.value, 'input').pipe(
+watch(searchInputRef, (el) => {
+  if (el) {
+    const searchInput$ = fromEvent(el, 'input').pipe(
       map((e) => e.target.value.trim()),
       debounceTime(300),
       distinctUntilChanged()
@@ -198,7 +197,16 @@ onMounted(() => {
     searchSubscription = searchInput$.subscribe((query) => {
       debouncedQuery.value = query
     })
+  } else {
+    if (searchSubscription) {
+      searchSubscription.unsubscribe()
+      searchSubscription = null
+    }
   }
+})
+
+onMounted(() => {
+  fetchSupplies()
 })
 
 onUnmounted(() => {
