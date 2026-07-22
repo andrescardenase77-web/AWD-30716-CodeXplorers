@@ -27,6 +27,7 @@
           <i class="bi bi-search text-muted"></i>
         </span>
         <input
+          ref="searchInputRef"
           type="text"
           v-model="searchQuery"
           class="form-control border-start-0"
@@ -155,8 +156,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { crudApi } from '@/services/http.js'
+import { fromEvent, map, debounceTime, distinctUntilChanged } from 'rxjs'
 
 const supplies = ref([])
 const loading = ref(true)
@@ -164,6 +166,10 @@ const deletingId = ref(null)
 const successMessage = ref('')
 const errorMessage = ref('')
 const searchQuery = ref('')
+const debouncedQuery = ref('')
+const searchInputRef = ref(null)
+let searchSubscription = null
+
 const showEditModal = ref(false)
 const saving = ref(false)
 const editingSupplyId = ref(null)
@@ -176,12 +182,30 @@ const editForm = ref({
 })
 
 const filteredSupplies = computed(() => {
-  if (!searchQuery.value.trim()) return supplies.value
-  const query = searchQuery.value.toLowerCase()
+  if (!debouncedQuery.value.trim()) return supplies.value
+  const query = debouncedQuery.value.toLowerCase()
   return supplies.value.filter((s) => s.supplyName.toLowerCase().includes(query))
 })
 
-onMounted(fetchSupplies)
+onMounted(() => {
+  fetchSupplies()
+  if (searchInputRef.value) {
+    const searchInput$ = fromEvent(searchInputRef.value, 'input').pipe(
+      map((e) => e.target.value.trim()),
+      debounceTime(300),
+      distinctUntilChanged()
+    )
+    searchSubscription = searchInput$.subscribe((query) => {
+      debouncedQuery.value = query
+    })
+  }
+})
+
+onUnmounted(() => {
+  if (searchSubscription) {
+    searchSubscription.unsubscribe()
+  }
+})
 
 async function fetchSupplies() {
   loading.value = true
