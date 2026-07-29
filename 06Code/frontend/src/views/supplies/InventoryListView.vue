@@ -136,9 +136,10 @@
                 <div class="col-sm-6">
                   <label class="form-label-styled">Costo Unitario ($)</label>
                   <input type="number" step="0.01" v-model.number="editForm.unitCost" class="form-input-styled" required />
+                  <p v-if="editForm.unitCost < 0" class="text-danger small mt-1">El costo no puede ser negativo.</p>
                 </div>
               </div>
-              <div class="row g-3 mb-4">
+              <div class="row g-3 mb-3">
                 <div class="col-sm-6">
                   <label class="form-label-styled">Fecha de Pedido</label>
                   <input type="date" v-model="editForm.orderDate" class="form-input-styled" required />
@@ -148,9 +149,12 @@
                   <input type="date" v-model="editForm.expirationDate" class="form-input-styled" required />
                 </div>
               </div>
+              <p v-if="editForm.orderDate && editForm.expirationDate && editForm.expirationDate < editForm.orderDate" class="text-danger small mb-3 mt-0">
+                La fecha de caducidad no puede ser anterior a la fecha de pedido.
+              </p>
               <div class="d-flex justify-content-end gap-2">
                 <button type="button" class="btn btn-outline-secondary" @click="closeEditModal">Cancelar</button>
-                <button type="submit" class="btn-primary-gradient border-0 px-4" :disabled="saving || editForm.quantity <= 0">
+                <button type="submit" class="btn-primary-gradient border-0 px-4" :disabled="saving || editForm.quantity <= 0 || editForm.unitCost < 0 || (editForm.orderDate && editForm.expirationDate && editForm.expirationDate < editForm.orderDate)">
                   <span v-if="saving" class="spinner-ring me-1"></span>
                   Guardar
                 </button>
@@ -165,10 +169,12 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
-import { crudApi } from '@/services/http.js'
+import { useSupplyStore } from '@/stores/supplyStore.js'
+import { storeToRefs } from 'pinia'
 import { fromEvent, map, debounceTime, distinctUntilChanged } from 'rxjs'
 
-const supplies = ref([])
+const supplyStore = useSupplyStore()
+const { supplies } = storeToRefs(supplyStore)
 const loading = ref(true)
 const deletingId = ref(null)
 const successMessage = ref('')
@@ -227,8 +233,7 @@ async function fetchSupplies() {
   loading.value = true
   errorMessage.value = ''
   try {
-    const response = await crudApi.get('/fabuladental/supplies')
-    supplies.value = response.data
+    await supplyStore.fetchSupplies()
   } catch {
     errorMessage.value = 'No se pudo cargar el catálogo de insumos. Por favor, intenta de nuevo.'
   } finally {
@@ -242,8 +247,7 @@ async function deleteSupply(supply) {
   }
   deletingId.value = supply.id
   try {
-    await crudApi.delete(`/fabuladental/supplies/${supply.id}`)
-    supplies.value = supplies.value.filter((s) => s.id !== supply.id)
+    await supplyStore.deleteSupply(supply.id)
     successMessage.value = `El insumo "${supply.supplyName}" fue eliminado correctamente.`
     setTimeout(() => { successMessage.value = '' }, 5000)
   } catch {
@@ -277,27 +281,19 @@ function closeEditModal() {
 
 async function saveSupply() {
   if (editForm.value.quantity <= 0) return
+  if (editForm.value.unitCost < 0) return
+  if (editForm.value.orderDate && editForm.value.expirationDate && editForm.value.expirationDate < editForm.value.orderDate) return
+
   saving.value = true
   errorMessage.value = ''
   try {
-    await crudApi.put(`/fabuladental/supplies/${editingSupplyId.value}`, {
+    await supplyStore.updateSupply(editingSupplyId.value, {
       supplyName: editForm.value.supplyName,
       quantity: editForm.value.quantity,
       unitCost: editForm.value.unitCost,
       orderDate: editForm.value.orderDate,
       expirationDate: editForm.value.expirationDate
     })
-    const idx = supplies.value.findIndex((s) => s.id === editingSupplyId.value)
-    if (idx !== -1) {
-      supplies.value[idx] = {
-        ...supplies.value[idx],
-        supplyName: editForm.value.supplyName,
-        quantity: editForm.value.quantity,
-        unitCost: editForm.value.unitCost,
-        orderDate: editForm.value.orderDate,
-        expirationDate: editForm.value.expirationDate
-      }
-    }
     successMessage.value = 'El insumo fue actualizado correctamente.'
     setTimeout(() => { successMessage.value = '' }, 5000)
     closeEditModal()

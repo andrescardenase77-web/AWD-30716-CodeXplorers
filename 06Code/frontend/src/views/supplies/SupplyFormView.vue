@@ -111,8 +111,9 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { crudApi } from '@/services/http.js'
+import { useSupplyStore } from '@/stores/supplyStore.js'
 
+const supplyStore = useSupplyStore()
 const submitting = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
@@ -183,7 +184,7 @@ async function submitForm() {
 
   submitting.value = true
   try {
-    await crudApi.post('/fabuladental/supply', {
+    await supplyStore.addSupply({
       supplyName: form.supplyName.trim(),
       quantity: form.quantity,
       unitCost: form.unitCost,

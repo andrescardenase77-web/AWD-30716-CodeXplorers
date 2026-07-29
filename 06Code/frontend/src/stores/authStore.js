@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import authService from '@/services/authService.js'
+import { blApi } from '@/services/http.js'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(authService.retrieveToken())
@@ -21,6 +22,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
     token.value = receivedToken
     isAuthenticated.value = true
+
+    if (receivedRole === 'Administrator') {
+      try {
+        await blApi.post('/fabuladental/supplies/status-calculations')
+      } catch (err) {
+        console.error('Failed to trigger supply status calculations on login:', err)
+      }
+    }
+
     return { token: receivedToken, role: receivedRole }
   }
 
